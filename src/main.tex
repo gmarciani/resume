@@ -1,0 +1,14 @@
+%-------------------------------------------------------------------------------
+% main.tex — entry point. Compile with: xelatex main.tex
+%
+% Layout/style lives in  layout.tex   (how the CV looks)
+% Content lives in        content.tex  (what the CV says)
+%-------------------------------------------------------------------------------
+\input{layout.tex}
+
+\begin{document}
+% content.tex only declares elements (fills the section buckets);
+% \makecv assembles them into the laid-out document.
+\input{content.tex}
+\makecv
+\end{document}

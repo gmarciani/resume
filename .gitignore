@@ -1,0 +1,37 @@
+# --- General ---
+.ignore/
+
+# --- AI ---
+.claude/
+
+# --- Build ---
+build/
+build.log
+
+# --- LaTeX ---
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex(busy)
+*.bbl
+*.bcf
+*.blg
+*.run.xml
+*.nav
+*.snm
+*.vrb
+*.xdv
+
+# --- Editor ---
+.idea/
+.vscode/
+
+# --- macOS ---
+.DS_Store
+.AppleDouble
+.LSOverride
+._*

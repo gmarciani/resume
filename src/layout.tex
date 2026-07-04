@@ -1,0 +1,362 @@
+%-------------------------------------------------------------------------------
+% layout.tex — LAYOUT & STYLE ONLY (no content)
+% Defines document class, page geometry, fonts, colors and the macros used by
+% content.tex. Edit this file to change how the CV looks.
+% Do not put CV content here. Entry point is resume.tex.
+%-------------------------------------------------------------------------------
+\documentclass[8pt]{extarticle} % base font size: change 8pt here
+
+\usepackage{geometry} % page size/margins are configured from settings below
+\usepackage{fontspec}
+\usepackage{paracol}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{fontawesome5}
+\usepackage{enumitem}
+\usepackage{ragged2e}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{assets/images/}}
+
+%=============================================================================
+%  CUSTOMIZE HERE — every tunable setting lives in this one block.
+%  Everything below it only references these constants, so you should not need
+%  to edit hex values, font files, sizes, ratios, or spacing anywhere else.
+%=============================================================================
+
+%--- Page: paper dimensions and margins --------------------------------------
+\newcommand{\cvpaperwidth}{559pt}
+\newcommand{\cvpaperheight}{790pt}
+\newcommand{\cvmargintop}{22pt}
+\newcommand{\cvmarginbottom}{20pt}
+\newcommand{\cvmarginleft}{26pt}
+\newcommand{\cvmarginright}{19pt}
+
+%--- Fonts: point these at any local .otf/.ttf files under \fontdir ----------
+\newcommand{\fontdir}{assets/fonts/}
+\newcommand{\fontregular}{SF-Pro-Text-Regular.otf}
+\newcommand{\fontbold}{SF-Pro-Text-Semibold.otf}
+\newcommand{\fontitalic}{SF-Pro-Text-RegularItalic.otf}
+\newcommand{\fontbolditalic}{SF-Pro-Text-SemiboldItalic.otf}
+\newcommand{\fontlight}{SF-Pro-Text-Light.otf}
+
+%--- Colors (hex, without the leading #) -------------------------------------
+\definecolor{accent}{HTML}{22A39F} % section headers, role line, links, badges
+\definecolor{ink}{HTML}{1A1A1A}    % primary text (name, titles, headline, body)
+\definecolor{muted}{HTML}{4D4D4D}  % education lines and footer
+\definecolor{meta}{HTML}{666666}   % entry meta lines (employer/years, venues)
+
+%--- Font sizes as {size}{leading} in pt -------------------------------------
+\newcommand{\sizename}{\fontsize{23pt}{25pt}\selectfont}     % header name
+\newcommand{\sizerole}{\fontsize{9pt}{11pt}\selectfont}      % header role line
+\newcommand{\sizeheadline}{\fontsize{10pt}{12pt}\selectfont} % header tagline
+\newcommand{\sizelabel}{\fontsize{8pt}{8pt}\selectfont}      % section + block labels
+\newcommand{\sizebody}{\fontsize{8pt}{10pt}\selectfont}      % normal body text
+\newcommand{\sizefooter}{\fontsize{6pt}{8pt}\selectfont}     % small-print footer
+
+%--- Text: line spacing and the name's letter-spacing (tracking) -------------
+\newcommand{\cvlinespread}{1.02}
+\newcommand{\cvnametracking}{4.0}
+
+%--- Layout: column ratios, gutter, page-2 offset, work split, icon/badge ----
+\newcommand{\headerratio}{0.74}  % header row: left column share (0-1)
+\newcommand{\bodyratio}{0.505}   % body rows: left column share (0-1)
+\newlength{\bodycolsep}\setlength{\bodycolsep}{8pt}         % gutter between body columns
+\newlength{\pagetwooffset}\setlength{\pagetwooffset}{68pt}  % top offset aligning page 2 to page 1
+\newcommand{\cvworksplit}{6}     % first N jobs go in the left column, rest in the right
+\newcommand{\cvsectioniconsize}{9pt}                        % section-header icon height
+\newcommand{\cvsectioniconraise}{-0.18em}                   % icon vertical nudge onto the label baseline
+\newlength{\cvsectioniconsep}\setlength{\cvsectioniconsep}{6pt}   % gap icon -> section label
+\newlength{\cvcoursebadgewidth}\setlength{\cvcoursebadgewidth}{13pt} % course grade badge width
+
+%--- Vertical spacing --------------------------------------------------------
+% content.tex never sets \vspace itself; these lengths control every gap and the
+% structural macros below insert them automatically. Keep the BETWEEN-block gaps
+% larger than the WITHIN-element gaps so sections stay visually separated from
+% the lines inside a single element.
+
+% Between blocks:
+\newlength{\sectiongap}\setlength{\sectiongap}{6pt}              % between sections (e.g. Introduction -> Experience)
+\newlength{\sectionlabelgap}\setlength{\sectionlabelgap}{4pt}    % section label -> its content
+\newlength{\headerblockgap}\setlength{\headerblockgap}{6pt}      % between header right-column blocks
+\newlength{\headerblocklabelgap}\setlength{\headerblocklabelgap}{2pt} % header block label -> its lines
+
+% Within the header:
+\newlength{\namegap}\setlength{\namegap}{6pt}                    % name -> role line
+\newlength{\rolegap}\setlength{\rolegap}{2pt}                    % role line -> headline
+\newlength{\headerbottomgap}\setlength{\headerbottomgap}{4pt}    % below the whole header
+\newlength{\contactlinegap}\setlength{\contactlinegap}{1pt}      % between contact lines
+
+% Within an element:
+\newlength{\bodygap}\setlength{\bodygap}{3pt}                    % between consecutive body paragraphs / entries
+\newlength{\newlinegap}\setlength{\newlinegap}{3pt}              % between \\ new lines in a body
+\newlength{\entrytopgap}\setlength{\entrytopgap}{3pt}            % above an entry title
+\newlength{\entrymetagap}\setlength{\entrymetagap}{1pt}          % below an entry meta line
+\newlength{\edugap}\setlength{\edugap}{2pt}                      % above an education row
+\newlength{\coursegap}\setlength{\coursegap}{1.5pt}             % between course rows
+\newlength{\skillgap}\setlength{\skillgap}{2pt}                 % above a skill row
+\newlength{\langtoppad}\setlength{\langtoppad}{2pt}            % lead-in above the language pair
+\newlength{\langlinegap}\setlength{\langlinegap}{1pt}         % language name -> level line
+\newcommand{\cvlangcellwidth}{0.5}                             % language cell width as a share of the column
+
+% Bullet lists (itemize) inside any body:
+\newcommand{\cvlistindent}{1em}  % bullet indentation
+\newlength{\cvlistitemsep}\setlength{\cvlistitemsep}{0pt}     % between list items
+\newlength{\cvlisttopsep}\setlength{\cvlisttopsep}{1pt}       % above/below the whole list
+\newlength{\cvlistparsep}\setlength{\cvlistparsep}{0pt}       % between paragraphs in an item
+%=============================================================================
+
+%----------------- APPLIES THE SETTINGS ABOVE (do not edit below) -----------------
+\geometry{
+  paperwidth=\cvpaperwidth, paperheight=\cvpaperheight,
+  top=\cvmargintop, bottom=\cvmarginbottom,
+  left=\cvmarginleft, right=\cvmarginright
+}
+
+\setmainfont{\fontregular}[
+  Path            = \fontdir,
+  BoldFont        = \fontbold,
+  ItalicFont      = \fontitalic,
+  BoldItalicFont  = \fontbolditalic
+]
+\newfontfamily\sflight{\fontlight}[Path=\fontdir]
+
+\color{ink}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\linespread{\cvlinespread}
+\renewcommand\normalsize{\sizebody}
+\normalsize
+
+% Tracks whether the next \body is the first of its group (no leading gap) or a
+% follow-on paragraph (gets \bodygap). Reset by every macro that opens a group.
+\newif\ifcvfirstbody
+\newcommand{\resetbodygap}{\global\cvfirstbodytrue}
+\resetbodygap
+
+%----------------- CONTENT BUCKETS (content.tex fills these) -----------------
+% content.tex declares only elements. Each element macro appends its rendered
+% form to one of these lists; \makecv (invoked once, from main.tex) lays the
+% lists out into sections, columns and pages. No structure lives in content.tex.
+\makeatletter
+\newcommand{\appendto}[2]{\g@addto@macro#1{#2}}
+\makeatother
+% Work experience is split across the page-1 column boundary: the first
+% \cvworksplit jobs fill the left column, the rest continue in the right column
+% (reproducing the original hand-placed layout). \cvworksplit is set above.
+\newcounter{cvjobno}
+\newcommand{\cvintro}{}
+\newcommand{\cvworkleft}{}
+\newcommand{\cvworkright}{}
+\newcommand{\cvprojects}{}
+\newcommand{\cvpubs}{}
+\newcommand{\cvedu}{}
+\newcommand{\cvcourses}{}
+\newcommand{\cvhonours}{}
+\newcommand{\cvskills}{}
+\newcommand{\cvlangs}{}
+\newcommand{\cvprojectsnote}{}
+\newcommand{\cvfootertext}{}
+
+%----------------- STRUCTURAL MACROS -----------------
+% Header block: name, role, tagline (left) + location/contacts (right)
+% -- Declarative header fields ---------------------------------------------
+% content.tex only DECLARES facts with these setters; it never touches the
+% document structure. \makecvheader renders them into the two-column header.
+%
+%   \name{GIACOMO MARCIANI}
+%   \role{SENIOR SOFTWARE ENGINEER}   % rendered bold
+%   \company{Amazon Web Services}     % rendered normal weight, after "@"
+%   \headline{Building High Performance Computing in the Cloud}
+%   \location[https://maps.google.com/...]{Boston, MA, United States} % URL optional
+%   \email{giacomo.marciani@gmail.com}
+%   \linkedin{gmarciani}          % handle only; label/URL are built here
+%   \github{gmarciani}            % handle only
+%   \makecvheader
+%
+% Any field left unset is simply omitted from the rendered header.
+\newcommand{\cvname}{}     \newcommand{\name}[1]{\renewcommand{\cvname}{#1}}
+\newcommand{\cvrole}{}     \newcommand{\role}[1]{\renewcommand{\cvrole}{#1}}
+\newcommand{\cvcompany}{}  \newcommand{\company}[1]{\renewcommand{\cvcompany}{#1}}
+\newcommand{\cvheadline}{} \newcommand{\headline}[1]{\renewcommand{\cvheadline}{#1}}
+% Location accepts an optional URL: \location[https://maps...]{Boston, MA, ...}
+% When given, the location text becomes a clickable link.
+\newcommand{\cvlocation}{}
+\newcommand{\cvlocationurl}{}
+\newcommand{\location}[2][]{%
+  \renewcommand{\cvlocation}{#2}\renewcommand{\cvlocationurl}{#1}}
+\newcommand{\cvemail}{}    \newcommand{\email}[1]{\renewcommand{\cvemail}{#1}}
+\newcommand{\cvlinkedin}{} \newcommand{\linkedin}[1]{\renewcommand{\cvlinkedin}{#1}}
+\newcommand{\cvgithub}{}   \newcommand{\github}[1]{\renewcommand{\cvgithub}{#1}}
+
+% \iffield{\cvxxx}{code} runs code only when field xxx was set (non-empty).
+\newcommand{\iffield}[2]{\ifx\relax#1\relax\else\ifx#1\empty\else#2\fi\fi}
+
+% Render the header from the declared fields.
+\newcommand{\makecvheader}{%
+  \cvcheckcontact
+  \columnratio{\headerratio}%
+  \begin{paracol}{2}
+  {\bfseries\sizename\color{ink}\addfontfeature{LetterSpace=\cvnametracking}\cvname}\\[\namegap]
+  {\sizerole\color{accent}{\bfseries\cvrole}\iffield{\cvcompany}{ @ \cvcompany}}\\[\rolegap]
+  {\sizeheadline\color{ink}\cvheadline}
+  \switchcolumn
+  \cvfirstheaderblocktrue
+  \iffield{\cvlocation}{\headerblock{LOCATION}{%
+    \iffield{\cvlocationurl}{\href{\cvlocationurl}{\cvlocation}}{\cvlocation}}}%
+  \ifcvhascontact\headerblock{CONTACTS}{\cvcontactlines}\fi
+  \end{paracol}
+  \vspace{\headerbottomgap}%
+}
+
+% True when at least one contact handle was declared.
+\newif\ifcvhascontact
+\newcommand{\cvcheckcontact}{%
+  \iffield{\cvemail}{\global\cvhascontacttrue}%
+  \iffield{\cvlinkedin}{\global\cvhascontacttrue}%
+  \iffield{\cvgithub}{\global\cvhascontacttrue}}
+
+% Assemble the contact lines from whichever handles were declared.
+\newcommand{\cvcontactlines}{%
+  \iffield{\cvemail}{\href{mailto:\cvemail}{\cvemail}\\[\contactlinegap]}%
+  \iffield{\cvlinkedin}{\href{https://linkedin.com/in/\cvlinkedin}{\cvlinkedin\ (LinkedIn)}\\[\contactlinegap]}%
+  \iffield{\cvgithub}{\href{https://github.com/\cvgithub}{\cvgithub\ (GitHub)}}%
+}
+
+% A labelled block for the header right column (e.g. Location, Contacts).
+% #1 = label  #2 = lines. A leading gap separates stacked blocks; the first
+% block in the column gets none.
+\newif\ifcvfirstheaderblock
+\newcommand{\headerblock}[2]{%
+  \ifcvfirstheaderblock\global\cvfirstheaderblockfalse\else\vspace{\headerblockgap}\fi
+  {\color{accent}\sizelabel #1}\\[\headerblocklabelgap]#2\par}
+
+%----------------- STRUCTURAL SKELETON (used only by \makecv) -----------------
+% content.tex never calls any of these; \makecv assembles the document.
+% Open / close the two independent body columns
+\newcommand{\bodystart}{%
+  \columnratio{\bodyratio}\setlength{\columnsep}{\bodycolsep}\begin{paracol}{2}}
+\newcommand{\bodyend}{\end{paracol}}
+% Switch from the left body column to the right one
+\newcommand{\rightcolumn}{\switchcolumn}
+% Page break that also applies the page-2 top alignment offset
+\newcommand{\cvnewpage}{\newpage\vspace*{\pagetwooffset}}
+
+% Section header: teal icon (from assets/images/) + teal uppercase label
+% #1 = icon file (in assets/images/), #2 = label
+\newcommand{\cvsection}[2]{%
+  \resetbodygap
+  \vspace{\sectiongap}%
+  \noindent\raisebox{\cvsectioniconraise}{\includegraphics[height=\cvsectioniconsize]{#1}}\hspace{\cvsectioniconsep}%
+  {\color{accent}\sizelabel #2}\par
+  \vspace{\sectionlabelgap}%
+}
+
+%----------------- ELEMENT RENDERERS (private) -----------------
+% These typeset one element. The public element macros below only APPEND a
+% call to one of these into a section bucket; nothing is typeset until \makecv.
+
+% Entry: bold title, muted meta line. Optional URL makes the title a clickable
+% teal link.  \entry[url]{Title}{Meta}
+\newcommand{\entry}[3][]{%
+  \resetbodygap
+  \vspace{\entrytopgap}%
+  {\bfseries\ifx\relax#1\relax #2\else\href{#1}{\color{accent}#2}\fi}\par
+  {\color{meta}#3}\par
+  \vspace{\entrymetagap}%
+}
+% A \\ inside any element body starts a new line separated by \newlinegap.
+\newcommand{\bodynewline}{\par\vspace{\newlinegap}}
+% Justified body paragraph. Consecutive paragraphs are separated by \bodygap;
+% the first after a section/entry gets no leading gap. Within the text, \\
+% inserts a \newlinegap-spaced new line.
+\long\def\body#1{%
+  \ifcvfirstbody\global\cvfirstbodyfalse\else\vspace{\bodygap}\fi
+  {\justifying\let\\\bodynewline #1\par}}
+% Education row: bold degree, muted school, muted years+grade.
+\newcommand{\renderedu}[3]{%
+  \resetbodygap
+  \vspace{\edugap}{\bfseries #1}\par
+  {\color{muted}#2}\par
+  {\color{muted}#3}\par}
+% Course row: name (left) + teal grade badge (right).
+\newcommand{\rendercourse}[2]{%
+  \noindent#1\hfill\colorbox{accent}{\makebox[\cvcoursebadgewidth][c]{\color{white}\bfseries#2}}\par
+  \vspace{\coursegap}}
+% Skill row: bold category + description.
+\newcommand{\renderskill}[2]{%
+  \vspace{\skillgap}\noindent{\bfseries #1}\quad #2\par}
+% One language proficiency as a half-column cell; consecutive cells sit side by
+% side, so declaring two languages reproduces the original paired row.
+\newcommand{\renderlanguage}[2]{%
+  \begin{minipage}[t]{\cvlangcellwidth\columnwidth}{\bfseries #1}\\[\langlinegap]{\color{meta}#2}\end{minipage}}
+% Small-print footer.
+\newcommand{\cvfooter}[1]{%
+  \vfill{\sflight\sizefooter\color{muted} #1\par}}
+
+%----------------- ELEMENT DECLARATIONS (content.tex uses only these) --------
+% Each macro appends its element to the relevant section bucket. content.tex is
+% a flat list of these calls: no sections, columns, pages, or body plumbing.
+% In any body/description, \\ starts a new line spaced by \newlinegap.
+%
+%   \introduction{First line.\\ Second line.\\ Third line.}
+%   \job[url]{Title}{Employer}{Years}{Description with a\\ new line}
+%   \project[url]{Title}{Meta}{Description with a\\ new line}
+%   \projectsnote{Trailing italic note under the projects.}
+%   \publication[url]{Title}{Venue}     % URL optional; title becomes a link
+%   \education{Degree}{School}{Years and grade}
+%   \course{Name}{Grade}
+%   \skill{Category}{Comma-separated items}
+%   \lang{Name}{Level}
+%   \footer{Small-print footer text.}
+% Introduction: a single element. Like every body, \\ starts a new line
+% (spaced by \newlinegap). content.tex declares exactly one \introduction.
+\long\def\introduction#1{\appendto\cvintro{\body{#1}}}
+% Jobs route to the left column bucket until \cvworksplit is reached, then to
+% the right column bucket — so content.tex just lists jobs in order.
+\newcommand{\job}[5][]{%
+  \stepcounter{cvjobno}%
+  \ifnum\value{cvjobno}>\cvworksplit\relax
+    \appendto\cvworkright{\entry[#1]{#2}{#3, #4}\body{#5}}%
+  \else
+    \appendto\cvworkleft{\entry[#1]{#2}{#3, #4}\body{#5}}%
+  \fi}
+\newcommand{\project}[4][]{\appendto\cvprojects{\entry[#1]{#2}{#3}\body{#4}}}
+\newcommand{\projectsnote}[1]{\appendto\cvprojectsnote{\body{\itshape #1}}}
+\newcommand{\publication}[3][]{\appendto\cvpubs{\entry[#1]{#2}{#3}}}
+\newcommand{\honour}[2]{\appendto\cvhonours{\entry{#1}{#2}}}
+\newcommand{\education}[3]{\appendto\cvedu{\renderedu{#1}{#2}{#3}}}
+\newcommand{\course}[2]{\appendto\cvcourses{\rendercourse{#1}{#2}}}
+\newcommand{\skill}[2]{\appendto\cvskills{\renderskill{#1}{#2}}}
+\newcommand{\lang}[2]{\appendto\cvlangs{\renderlanguage{#1}{#2}}}
+\newcommand{\footer}[1]{\renewcommand{\cvfootertext}{#1}}
+
+%----------------- DOCUMENT ASSEMBLY -----------------
+% Renders the whole CV from the declared header fields and section buckets.
+% Fixed placement: page 1 (Intro+Work | Projects+Publications),
+% page 2 (Education+Courses | Honours+Skills+Languages).
+\newcommand{\makecv}{%
+  \makecvheader
+  % --- Page 1 ---
+  \bodystart
+    \cvsection{introduction}{INTRODUCTION}\cvintro
+    \cvsection{work}{WORK EXPERIENCE}\cvworkleft
+  \rightcolumn
+    \cvworkright
+    \cvsection{projects}{MAIN PROJECTS}\cvprojects\cvprojectsnote
+    \cvsection{publications}{PUBLICATIONS}\cvpubs
+  \bodyend
+  % --- Page 2 ---
+  \cvnewpage
+  \bodystart
+    \cvsection{education}{EDUCATION}\cvedu
+    \cvsection{courses}{MAIN COURSES}\cvcourses
+  \rightcolumn
+    \cvsection{honours}{HONOURS}\cvhonours
+    \cvsection{skills}{MAIN SKILLS}\cvskills
+    \cvsection{languages}{LANGUAGES}\vspace{\langtoppad}\noindent\cvlangs\par
+  \bodyend
+  \cvfooter{\cvfootertext}%
+}
+
+\setlist[itemize]{leftmargin=\cvlistindent, itemsep=\cvlistitemsep, topsep=\cvlisttopsep, parsep=\cvlistparsep}
