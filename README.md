@@ -4,11 +4,19 @@ My resume, buolt with LaTeX.
 
 ## Requirements
 
-- **XeLaTeX** — the TeX engine used to compile the document (it is required
-  because the résumé embeds local OpenType fonts via `fontspec`). Ships with
-  [MacTeX](https://tug.org/mactex/) (or `brew install --cask mactex`).
-- **GNU Make** — runs the build targets in the `Makefile`. Included with the
-  Xcode Command Line Tools (`xcode-select --install`).
+- **macOS** with [Homebrew](https://brew.sh/) installed.
+- **GNU Make** — included with the Xcode Command Line Tools
+  (`xcode-select --install`).
+
+Install all LaTeX dependencies (BasicTeX + required packages) with:
+
+```sh
+make setup
+```
+
+This installs [BasicTeX](https://tug.org/mactex/morepackages.html) via
+Homebrew and adds the CTAN packages the document needs (`paracol`,
+`fontawesome5`, `enumitem`). You only need to run it once.
 
 ## Building
 

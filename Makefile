@@ -16,7 +16,12 @@ ROOT_PDF  := $(PDF_NAME)
 # Let xelatex find layout.tex / content.tex and the assets under src/ and root.
 export TEXINPUTS := .:./$(SRC_DIR):
 
-.PHONY: build view publish clean
+.PHONY: setup build view publish clean
+
+setup:
+	brew install --cask basictex
+	sudo tlmgr update --self
+	sudo tlmgr install paracol fontawesome5 enumitem
 
 build:
 	mkdir -p $(BUILD_DIR)
