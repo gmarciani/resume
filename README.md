@@ -13,9 +13,10 @@ My resume, buolt with LaTeX.
 ## Building
 
 ```sh
-make build   # build build/resume.pdf (default target)
-make view    # build, then open the PDF
-make clean   # remove the build/ folder
+make build     # build build/resume.pdf (default target)
+make view      # open the built PDF
+make publish   # build, copy the PDF to the repo root, then commit and push (prompts first)
+make clean     # remove the build/ folder
 ```
 
 ## Project Structure
