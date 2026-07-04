@@ -2,7 +2,7 @@
 #
 #   make build    build $(PDF) (default)
 #   make view     open the built PDF (does not build; errors if missing)
-#   make publish  copy the built PDF to the repo root, then commit and push
+#   make publish  view the built PDF, then copy it to the repo root, commit and push
 #   make clean    remove the build folder
 
 SRC_DIR   := src
@@ -30,9 +30,9 @@ build:
 view:
 	open $(PDF)
 
-# Publish the built PDF to the repo root, then commit and push it.
-# Prompts for confirmation before touching git.
-publish: build
+# Publish the currently built PDF to the repo root, then commit and push it.
+# Opens the PDF for review first, then prompts for confirmation before git.
+publish: view
 	cp $(PDF) $(ROOT_PDF)
 	@printf 'Are you sure you want to publish %s? [y/N] ' '$(ROOT_PDF)'; \
 	read ans; \
