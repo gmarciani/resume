@@ -21,9 +21,8 @@ Homebrew and adds the CTAN packages the document needs (`paracol`,
 ## Building
 
 ```sh
-make build     # build build/resume.pdf (default target)
+make build     # build build/resume.pdf and copy to public/ (default target)
 make view      # open the built PDF
-make publish   # build, copy the PDF to the repo root, then commit and push (prompts first)
 make clean     # remove the build/ folder
 ```
 
