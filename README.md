@@ -1,6 +1,8 @@
 # Resume
 
-My resume, buolt with LaTeX.
+My resume, built with LaTeX.
+
+Check it out at https://gmarciani.github.io/resume/resume.pdf.
 
 ## Requirements
 
