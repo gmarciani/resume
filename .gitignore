@@ -35,3 +35,6 @@ build.log
 .AppleDouble
 .LSOverride
 ._*
+
+# Assets
+assets/positions
