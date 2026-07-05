@@ -14,7 +14,7 @@
 \usepackage[inkscapepath=build/svg-inkscape]{svg}
 \usepackage{fontawesome5}
 \usepackage{enumitem}
-\usepackage{ragged2e}
+\usepackage[document]{ragged2e}
 \usepackage[hidelinks]{hyperref}
 
 \graphicspath{{assets/images/}}
@@ -125,6 +125,7 @@
 \color{primary}
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
+\setlength{\JustifyingParindent}{0pt}
 \linespread{\cvlinespread}
 \renewcommand\normalsize{\sizebody}
 \normalsize
@@ -281,7 +282,7 @@
 % inserts a \newlinegap-spaced new line.
 \long\def\body#1{%
   \ifcvfirstbody\global\cvfirstbodyfalse\else\vspace{\bodygap}\fi
-  {\justifying\let\\\bodynewline #1\par}}
+  \noindent\begingroup\justifying\setlength{\parindent}{0pt}\let\\\bodynewline #1\par\endgroup}
 % Education row: bold degree, muted school, muted years+grade.
 \newcommand{\renderedu}[3]{%
   \resetbodygap
