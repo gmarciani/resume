@@ -11,12 +11,14 @@
 \usepackage{paracol}
 \usepackage{xcolor}
 \usepackage{graphicx}
+\usepackage[inkscapepath=build/svg-inkscape]{svg}
 \usepackage{fontawesome5}
 \usepackage{enumitem}
 \usepackage{ragged2e}
 \usepackage[hidelinks]{hyperref}
 
 \graphicspath{{assets/images/}}
+\svgpath{{assets/images/}}
 
 %=============================================================================
 %  CUSTOMIZE HERE — every tunable setting lives in this one block.
@@ -242,11 +244,11 @@
 \newcommand{\cvnewpage}{\newpage\vspace*{\pagetwooffset}}
 
 % Section header: teal icon (from assets/images/) + teal uppercase label
-% #1 = icon file (in assets/images/), #2 = label
+% #1 = icon file (in assets/images/, without extension), #2 = label
 \newcommand{\cvsection}[2]{%
   \resetbodygap
   \vspace{\sectiongap}%
-  \noindent\raisebox{\cvsectioniconraise}{\includegraphics[height=\cvsectioniconsize]{#1}}\hspace{\cvsectioniconsep}%
+  \noindent\raisebox{\cvsectioniconraise}{\includesvg[height=\cvsectioniconsize]{#1}}\hspace{\cvsectioniconsep}%
   {\color{accent}\sizelabel #2}\par
   \vspace{\sectionlabelgap}%
 }
