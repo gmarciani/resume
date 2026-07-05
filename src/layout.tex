@@ -42,9 +42,8 @@
 
 %--- Colors (hex, without the leading #) -------------------------------------
 \definecolor{accent}{HTML}{22A39F} % section headers, role line, links, badges
-\definecolor{ink}{HTML}{1A1A1A}    % primary text (name, titles, headline, body)
-\definecolor{muted}{HTML}{4D4D4D}  % education lines and footer
-\definecolor{meta}{HTML}{666666}   % entry meta lines (employer/years, venues)
+\definecolor{primary}{HTML}{1A1A1A}    % primary text (name, titles, headline, body)
+\definecolor{secondary}{HTML}{666666}  % secondary text (education, footer, entry meta)
 
 %--- Font sizes as {size}{leading} in pt -------------------------------------
 \newcommand{\sizename}{\fontsize{23pt}{25pt}\selectfont}     % header name
@@ -121,7 +120,7 @@
 ]
 \newfontfamily\sflight{\fontlight}[Path=\fontdir]
 
-\color{ink}
+\color{primary}
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
 \linespread{\cvlinespread}
@@ -155,7 +154,7 @@
 \newcommand{\cvhonours}{}
 \newcommand{\cvskills}{}
 \newcommand{\cvlangs}{}
-\newcommand{\cvprojectsnote}{}
+\newcommand{\cvsectionfootnote}{}
 \newcommand{\cvfootertext}{}
 
 %----------------- STRUCTURAL MACROS -----------------
@@ -197,13 +196,13 @@
   \cvcheckcontact
   \columnratio{\headerratio}%
   \begin{paracol}{2}
-  {\bfseries\sizename\color{ink}\addfontfeature{LetterSpace=\cvnametracking}\cvname}\\[\namegap]
+  {\bfseries\sizename\color{primary}\addfontfeature{LetterSpace=\cvnametracking}\cvname}\\[\namegap]
   {\sizerole\color{accent}{\bfseries\cvrole}\iffield{\cvcompany}{ @ \cvcompany}}\\[\rolegap]
-  {\sizeheadline\color{ink}\cvheadline}
+  {\sizeheadline\color{primary}\cvheadline}
   \switchcolumn
   \cvfirstheaderblocktrue
   \iffield{\cvlocation}{\headerblock{LOCATION}{%
-    \iffield{\cvlocationurl}{\href{\cvlocationurl}{\cvlocation}}{\cvlocation}}}%
+    \ifx\cvlocationurl\empty\cvlocation\else\href{\cvlocationurl}{\cvlocation}\fi}}%
   \ifcvhascontact\headerblock{CONTACTS}{\cvcontactlines}\fi
   \end{paracol}
   \vspace{\headerbottomgap}%
@@ -256,13 +255,21 @@
 % These typeset one element. The public element macros below only APPEND a
 % call to one of these into a section bucket; nothing is typeset until \makecv.
 
-% Entry: bold title, muted meta line. Optional URL makes the title a clickable
+% Entry: bold title, secondary meta line. Optional URL makes the title a clickable
 % teal link.  \entry[url]{Title}{Meta}
 \newcommand{\entry}[3][]{%
   \resetbodygap
   \vspace{\entrytopgap}%
   {\bfseries\ifx\relax#1\relax #2\else\href{#1}{\color{accent}#2}\fi}\par
-  {\color{meta}#3}\par
+  {\color{secondary}#3}\par
+  \vspace{\entrymetagap}%
+}
+% Entry variant where linked titles use primary color instead of accent.
+\newcommand{\entryprimary}[3][]{%
+  \resetbodygap
+  \vspace{\entrytopgap}%
+  {\bfseries\ifx\relax#1\relax #2\else\href{#1}{\color{primary}#2}\fi}\par
+  {\color{secondary}#3}\par
   \vspace{\entrymetagap}%
 }
 % A \\ inside any element body starts a new line separated by \newlinegap.
@@ -277,8 +284,8 @@
 \newcommand{\renderedu}[3]{%
   \resetbodygap
   \vspace{\edugap}{\bfseries #1}\par
-  {\color{muted}#2}\par
-  {\color{muted}#3}\par}
+  {\color{secondary}#2}\par
+  {\color{secondary}#3}\par}
 % Course row: name (left) + teal grade badge (right).
 \newcommand{\rendercourse}[2]{%
   \noindent#1\hfill\colorbox{accent}{\makebox[\cvcoursebadgewidth][c]{\color{white}\bfseries#2}}\par
@@ -289,10 +296,10 @@
 % One language proficiency as a half-column cell; consecutive cells sit side by
 % side, so declaring two languages reproduces the original paired row.
 \newcommand{\renderlanguage}[2]{%
-  \begin{minipage}[t]{\cvlangcellwidth\columnwidth}{\bfseries #1}\\[\langlinegap]{\color{meta}#2}\end{minipage}}
+  \begin{minipage}[t]{\cvlangcellwidth\columnwidth}{\bfseries #1}\\[\langlinegap]{\color{secondary}#2}\end{minipage}}
 % Small-print footer.
 \newcommand{\cvfooter}[1]{%
-  \vfill{\sflight\sizefooter\color{muted} #1\par}}
+  \vfill{\sflight\sizefooter\color{secondary} #1\par}}
 
 %----------------- ELEMENT DECLARATIONS (content.tex uses only these) --------
 % Each macro appends its element to the relevant section bucket. content.tex is
@@ -302,7 +309,7 @@
 %   \introduction{First line.\\ Second line.\\ Third line.}
 %   \job[url]{Title}{Employer}{Years}{Description with a\\ new line}
 %   \project[url]{Title}{Meta}{Description with a\\ new line}
-%   \projectsnote{Trailing italic note under the projects.}
+%   \sectionfootnote{Trailing italic note under a section.}
 %   \publication[url]{Title}{Venue}     % URL optional; title becomes a link
 %   \education{Degree}{School}{Years and grade}
 %   \course{Name}{Grade}
@@ -321,9 +328,9 @@
   \else
     \appendto\cvworkleft{\entry[#1]{#2}{#3, #4}\body{#5}}%
   \fi}
-\newcommand{\project}[4][]{\appendto\cvprojects{\entry[#1]{#2}{#3}\body{#4}}}
-\newcommand{\projectsnote}[1]{\appendto\cvprojectsnote{\body{\itshape #1}}}
-\newcommand{\publication}[3][]{\appendto\cvpubs{\entry[#1]{#2}{#3}}}
+\newcommand{\project}[4][]{\appendto\cvprojects{\entryprimary[#1]{#2}{#3}\body{#4}}}
+\newcommand{\sectionfootnote}[1]{\appendto\cvsectionfootnote{\body{\color{secondary}\itshape #1}}}
+\newcommand{\publication}[3][]{\appendto\cvpubs{\entryprimary[#1]{#2}{#3}}}
 \newcommand{\honour}[2]{\appendto\cvhonours{\entry{#1}{#2}}}
 \newcommand{\education}[3]{\appendto\cvedu{\renderedu{#1}{#2}{#3}}}
 \newcommand{\course}[2]{\appendto\cvcourses{\rendercourse{#1}{#2}}}
@@ -343,7 +350,7 @@
     \cvsection{work}{WORK EXPERIENCE}\cvworkleft
   \rightcolumn
     \cvworkright
-    \cvsection{projects}{MAIN PROJECTS}\cvprojects\cvprojectsnote
+    \cvsection{projects}{MAIN PROJECTS}\cvprojects\cvsectionfootnote
     \cvsection{publications}{PUBLICATIONS}\cvpubs
   \bodyend
   % --- Page 2 ---
