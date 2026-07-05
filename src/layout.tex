@@ -240,8 +240,8 @@
 \newcommand{\bodyend}{\end{paracol}}
 % Switch from the left body column to the right one
 \newcommand{\rightcolumn}{\switchcolumn}
-% Page break that also applies the page-2 top alignment offset
-\newcommand{\cvnewpage}{\newpage\vspace*{\pagetwooffset}}
+% Page break that repeats the header on the new page
+\newcommand{\cvnewpage}{\newpage\makecvheader}
 
 % Section header: teal icon (from assets/images/) + teal uppercase label
 % #1 = icon file (in assets/images/, without extension), #2 = label
