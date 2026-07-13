@@ -16,6 +16,10 @@
 \usepackage{enumitem}
 \usepackage[document]{ragged2e}
 \usepackage[hidelinks]{hyperref}
+% hyperxmp writes an XMP metadata stream (Dublin Core) mirroring the \hypersetup
+% Info fields, so web crawlers and document systems can read title/author/
+% subject/keywords. Vendored under ./vendor (see Makefile TEXINPUTS).
+\usepackage{hyperxmp}
 \usepackage{tikz}
 
 \graphicspath{{assets/images/}}
@@ -130,7 +134,9 @@
   pdfauthor   = {Giacomo Marciani},
   pdfsubject  = {Senior Software Engineer - High Performance Computing, Distributed Systems, Cloud Infrastructure},
   pdfkeywords = {Senior Software Engineer, High Performance Computing, HPC, AWS, Amazon Web Services, AWS ParallelCluster, NICE EnginFrame, Slurm, MPI, CUDA, Nvidia GPU, Lustre, EFA, Distributed Systems, Cloud Infrastructure, Infrastructure as Code, Terraform, CloudFormation, Kubernetes, CI/CD, Observability, Security, Threat Modeling, Big Data, Flink, Kafka, Hadoop, Python, Java, Technical Leadership, System Design, Mentoring},
-  pdflang     = {en}
+  pdflang     = {en},
+  % dc:source in the XMP stream; set to the canonical URL instead of the .tex filename.
+  pdfsource   = {https://gmarciani.github.io/resume/resume.pdf}
 }
 
 % Prevent line-break hyphenation from splitting words in the text layer

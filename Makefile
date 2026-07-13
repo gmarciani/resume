@@ -21,7 +21,7 @@ export TEXINPUTS := .:./$(SRC_DIR):
 setup:
 	brew install --cask basictex inkscape
 	sudo tlmgr update --self
-	sudo tlmgr install paracol fontawesome5 enumitem svg trimspaces transparent catchfile footmisc
+	sudo tlmgr install paracol fontawesome5 enumitem svg trimspaces transparent catchfile footmisc hyperxmp ifmtarg hyperxmp
 
 build:
 	mkdir -p $(BUILD_DIR)
