@@ -123,6 +123,22 @@
 ]
 \newfontfamily\sflight{\fontlight}[Path=\fontdir]
 
+% PDF document metadata. LinkedIn and many HR/ATS tools read these fields;
+% pdfkeywords carries role-relevant terms for keyword matching.
+\hypersetup{
+  pdftitle    = {Giacomo Marciani - Resume},
+  pdfauthor   = {Giacomo Marciani},
+  pdfsubject  = {Senior Software Engineer - High Performance Computing, Distributed Systems, Cloud Infrastructure},
+  pdfkeywords = {Senior Software Engineer, High Performance Computing, HPC, AWS, Amazon Web Services, AWS ParallelCluster, NICE EnginFrame, Slurm, MPI, CUDA, Nvidia GPU, Lustre, EFA, Distributed Systems, Cloud Infrastructure, Infrastructure as Code, Terraform, CloudFormation, Kubernetes, CI/CD, Observability, Security, Threat Modeling, Big Data, Flink, Kafka, Hadoop, Python, Java, Technical Leadership, System Design, Mentoring},
+  pdflang     = {en}
+}
+
+% Prevent line-break hyphenation from splitting words in the text layer
+% (e.g. "High Per-formance Computing"), which breaks ATS/AI keyword matching.
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+\tolerance=2000
+
 \color{primary}
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
@@ -223,10 +239,12 @@
   \iffield{\cvgithub}{\global\cvhascontacttrue}}
 
 % Assemble the contact lines from whichever handles were declared.
+% Show full URLs as visible text so text-only parsers capture them (not just
+% the embedded hyperlink target).
 \newcommand{\cvcontactlines}{%
   \iffield{\cvemail}{\href{mailto:\cvemail}{\cvemail}\\[\contactlinegap]}%
-  \iffield{\cvlinkedin}{\href{https://linkedin.com/in/\cvlinkedin}{\cvlinkedin\ (LinkedIn)}\\[\contactlinegap]}%
-  \iffield{\cvgithub}{\href{https://github.com/\cvgithub}{\cvgithub\ (GitHub)}}%
+  \iffield{\cvlinkedin}{\href{https://linkedin.com/in/\cvlinkedin}{linkedin.com/in/\cvlinkedin}\\[\contactlinegap]}%
+  \iffield{\cvgithub}{\href{https://github.com/\cvgithub}{github.com/\cvgithub}}%
 }
 
 % A labelled block for the header right column (e.g. Location, Contacts).
@@ -286,7 +304,7 @@
 % inserts a \newlinegap-spaced new line.
 \long\def\body#1{%
   \ifcvfirstbody\global\cvfirstbodyfalse\else\vspace{\bodygap}\fi
-  \noindent\begingroup\justifying\setlength{\parindent}{0pt}\let\\\bodynewline #1\par\endgroup}
+  \noindent\begingroup\RaggedRight\setlength{\parindent}{0pt}\let\\\bodynewline #1\par\endgroup}
 % Education row: bold degree, school + years on one line, grade on third line.
 \newcommand{\renderedu}[3]{%
   \resetbodygap
@@ -353,19 +371,19 @@
   \makecvheader
   % --- Page 1 ---
   \bodystart
-    \cvsection{introduction}{INTRODUCTION}\cvintro
+    \cvsection{introduction}{SUMMARY}\cvintro
     \cvsection{work}{WORK EXPERIENCE}\cvworkleft
   \rightcolumn
     \cvworkright
-    \cvsection{projects}{MAIN PROJECTS}\cvprojects\cvsectionfootnote
+    \cvsection{projects}{PROJECTS}\cvprojects\cvsectionfootnote
     \cvsection{publications}{PUBLICATIONS}\cvpubs
   \bodyend
   % --- Page 2 ---
   \cvnewpage
   \bodystart
     \cvsection{education}{EDUCATION}\cvedu
-    \cvsection{skills}{MAIN SKILLS}\cvskills
-    \cvsection{honours}{HONOURS}\cvhonours
+    \cvsection{skills}{SKILLS}\cvskills
+    \cvsection{honours}{AWARDS}\cvhonours
     %\cvsection{courses}{MAIN COURSES}\cvcourses
   \rightcolumn
     \cvsection{languages}{LANGUAGES}\vspace{\langtoppad}\noindent\cvlangs\par
