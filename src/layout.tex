@@ -14,7 +14,7 @@
 \usepackage[inkscapepath=build/svg-inkscape]{svg}
 \usepackage{fontawesome5}
 \usepackage{enumitem}
-\usepackage[document]{ragged2e}
+\usepackage{ragged2e}
 \usepackage[hidelinks]{hyperref}
 % hyperxmp writes an XMP metadata stream (Dublin Core) mirroring the \hypersetup
 % Info fields, so web crawlers and document systems can read title/author/
@@ -57,7 +57,8 @@
 \newcommand{\sizerole}{\fontsize{9pt}{11pt}\selectfont}      % header role line
 \newcommand{\sizeheadline}{\fontsize{10pt}{12pt}\selectfont} % header tagline
 \newcommand{\sizelabel}{\fontsize{8pt}{8pt}\selectfont}      % section + block labels
-\newcommand{\sizebody}{\fontsize{8pt}{10pt}\selectfont}      % normal body text
+\newcommand{\sizeheadertext}{\fontsize{8pt}{10pt}\selectfont} % header block lines (location, contacts)
+\newcommand{\sizebody}{\fontsize{8.8pt}{11pt}\selectfont}  % normal body text
 \newcommand{\sizefooter}{\fontsize{6pt}{8pt}\selectfont}     % small-print footer
 
 %--- Text: line spacing and the name's letter-spacing (tracking) -------------
@@ -69,7 +70,7 @@
 \newcommand{\bodyratio}{0.505}   % body rows: left column share (0-1)
 \newlength{\bodycolsep}\setlength{\bodycolsep}{8pt}         % gutter between body columns
 \newlength{\pagetwooffset}\setlength{\pagetwooffset}{68pt}  % top offset aligning page 2 to page 1
-\newcommand{\cvworksplit}{6}     % first N jobs go in the left column, rest in the right
+\newcommand{\cvworksplit}{1}     % first N jobs go in the left column, rest in the right
 \newcommand{\cvsectioniconsize}{9pt}                        % section-header icon height
 \newcommand{\cvsectioniconraise}{-0.18em}                   % icon vertical nudge onto the label baseline
 \newlength{\cvsectioniconsep}\setlength{\cvsectioniconsep}{6pt}   % gap icon -> section label
@@ -96,12 +97,12 @@
 % Within an element:
 \newlength{\bodygap}\setlength{\bodygap}{3pt}                    % between consecutive body paragraphs / entries
 \newlength{\newlinegap}\setlength{\newlinegap}{3pt}              % between \\ new lines in a body
-\newlength{\entrytopgap}\setlength{\entrytopgap}{3pt}            % above an entry title
+\newlength{\entrytopgap}\setlength{\entrytopgap}{2.4pt}            % above an entry title
 \newlength{\entrymetagap}\setlength{\entrymetagap}{1pt}          % below an entry meta line
-\newlength{\edugap}\setlength{\edugap}{2pt}                      % above an education row
-\newlength{\coursegap}\setlength{\coursegap}{1.5pt}             % between course rows
-\newlength{\skillgap}\setlength{\skillgap}{2pt}                 % above a skill row
-\newlength{\langtoppad}\setlength{\langtoppad}{2pt}            % lead-in above the language pair
+\newlength{\edugap}\setlength{\edugap}{2.4pt}                      % above an education row
+\newlength{\coursegap}\setlength{\coursegap}{1.8pt}             % between course rows
+\newlength{\skillgap}\setlength{\skillgap}{2.4pt}                 % above a skill row
+\newlength{\langtoppad}\setlength{\langtoppad}{2.4pt}            % lead-in above the language pair
 \newlength{\langlinegap}\setlength{\langlinegap}{1pt}         % language name -> level line
 \newcommand{\cvlangcellwidth}{0.5}                             % language cell width as a share of the column
 
@@ -130,10 +131,13 @@
 % PDF document metadata. LinkedIn and many HR/ATS tools read these fields;
 % pdfkeywords carries role-relevant terms for keyword matching.
 \hypersetup{
+  % hyperxmp moves Author/Keywords to the XMP stream only; keeppdfinfo also
+  % keeps them in the classic Info dictionary, which LinkedIn and ATS tools read.
+  keeppdfinfo = true,
   pdftitle    = {Giacomo Marciani - Resume},
   pdfauthor   = {Giacomo Marciani},
-  pdfsubject  = {Senior Software Engineer - High Performance Computing, Distributed Systems, Cloud Infrastructure},
-  pdfkeywords = {Senior Software Engineer, High Performance Computing, HPC, AWS, Amazon Web Services, AWS ParallelCluster, NICE EnginFrame, Slurm, MPI, CUDA, Nvidia GPU, Lustre, EFA, Distributed Systems, Cloud Infrastructure, Infrastructure as Code, Terraform, CloudFormation, Kubernetes, CI/CD, Observability, Security, Threat Modeling, Big Data, Flink, Kafka, Hadoop, Python, Java, Technical Leadership, System Design, Mentoring},
+  pdfsubject  = {Senior Software Engineer - High Performance Computing, Distributed Systems, Cloud Architecture},
+  pdfkeywords = {Senior Software Engineer, High Performance Computing, HPC, AWS, Amazon Web Services, AWS ParallelCluster, NICE EnginFrame, Elastic Inference, Elastic Graphics, Slurm, MPI, CUDA, NVIDIA GPU, GPU Acceleration, Lustre, EFA, EC2, ECS, Serverless, Distributed Systems, Cloud Architecture, Infrastructure as Code, Terraform, CloudFormation, Docker, Linux, Kubernetes, CI/CD, Jenkins, Observability, Grafana, Prometheus, Incident Response, On-call, Security, Threat Modeling, Big Data, Stream Processing, Flink, Kafka, Hadoop, Machine Learning, Python, Java, React, Open Source, Technical Leadership, System Design, Roadmap, Mentoring, Hiring, Scrum, Boston},
   pdflang     = {en},
   % dc:source in the XMP stream; set to the canonical URL instead of the .tex filename.
   pdfsource   = {https://gmarciani.github.io/resume/resume.pdf}
@@ -144,6 +148,7 @@
 \hyphenpenalty=10000
 \exhyphenpenalty=10000
 \tolerance=2000
+\emergencystretch=3em % last-resort stretch so unhyphenated long words wrap instead of overflowing the column
 
 \color{primary}
 \pagestyle{empty}
@@ -259,7 +264,7 @@
 \newif\ifcvfirstheaderblock
 \newcommand{\headerblock}[2]{%
   \ifcvfirstheaderblock\global\cvfirstheaderblockfalse\else\vspace{\headerblockgap}\fi
-  {\color{accent}\sizelabel #1}\\[\headerblocklabelgap]#2\par}
+  {\color{accent}\sizelabel #1}\\[\headerblocklabelgap]{\sizeheadertext #2\par}}
 
 %----------------- STRUCTURAL SKELETON (used only by \makecv) -----------------
 % content.tex never calls any of these; \makecv assembles the document.
@@ -310,7 +315,7 @@
 % inserts a \newlinegap-spaced new line.
 \long\def\body#1{%
   \ifcvfirstbody\global\cvfirstbodyfalse\else\vspace{\bodygap}\fi
-  \noindent\begingroup\RaggedRight\setlength{\parindent}{0pt}\let\\\bodynewline #1\par\endgroup}
+  \noindent\begingroup\justifying\setlength{\parindent}{0pt}\let\\\bodynewline #1\par\endgroup}
 % Education row: bold degree, school + years on one line, grade on third line.
 \newcommand{\renderedu}[3]{%
   \resetbodygap
@@ -328,9 +333,10 @@
 % side, so declaring two languages reproduces the original paired row.
 \newcommand{\renderlanguage}[2]{%
   \begin{minipage}[t]{\cvlangcellwidth\columnwidth}{\bfseries #1}\\[\langlinegap]{\color{secondary}#2}\end{minipage}}
-% Small-print footer.
-\newcommand{\cvfooter}[1]{%
-  \vfill{\sflight\sizefooter\color{secondary} #1\par}}
+% Small-print note rendered directly under the Education section (same column),
+% so a starred remark stays next to the entry it refers to.
+\newcommand{\cvedunote}{%
+  \iffield{\cvfootertext}{\vspace{\edugap}{\sflight\sizefooter\color{secondary}\cvfootertext\par}}}
 
 %----------------- ELEMENT DECLARATIONS (content.tex uses only these) --------
 % Each macro appends its element to the relevant section bucket. content.tex is
@@ -346,7 +352,7 @@
 %   \course{Name}{Grade}
 %   \skill{Category}{Comma-separated items}
 %   \lang{Name}{Level}
-%   \footer{Small-print footer text.}
+%   \footer{Small-print note shown under the Education section.}
 % Introduction: a single element. Like every body, \\ starts a new line
 % (spaced by \newlinegap). content.tex declares exactly one \introduction.
 \long\def\introduction#1{\appendto\cvintro{\body{#1}}}
@@ -371,8 +377,8 @@
 
 %----------------- DOCUMENT ASSEMBLY -----------------
 % Renders the whole CV from the declared header fields and section buckets.
-% Fixed placement: page 1 (Intro+Work | Projects+Publications),
-% page 2 (Education+Courses | Honours+Skills+Languages).
+% Fixed placement: page 1 (Intro+Work | Work+Skills),
+% page 2 (Projects | Publications+Education+Awards+Languages).
 \newcommand{\makecv}{%
   \makecvheader
   % --- Page 1 ---
@@ -381,20 +387,20 @@
     \cvsection{work}{WORK EXPERIENCE}\cvworkleft
   \rightcolumn
     \cvworkright
-    \cvsection{projects}{PROJECTS}\cvprojects\cvsectionfootnote
-    \cvsection{publications}{PUBLICATIONS}\cvpubs
+    \cvsection{skills}{SKILLS}\cvskills
   \bodyend
   % --- Page 2 ---
   \cvnewpage
   \bodystart
-    \cvsection{education}{EDUCATION}\cvedu
-    \cvsection{skills}{SKILLS}\cvskills
-    \cvsection{honours}{AWARDS}\cvhonours
+    \cvsection{projects}{PROJECTS}\cvprojects\cvsectionfootnote
     %\cvsection{courses}{MAIN COURSES}\cvcourses
   \rightcolumn
-    \cvsection{languages}{LANGUAGES}\vspace{\langtoppad}\noindent\cvlangs\par
+    \cvsection{publications}{PUBLICATIONS}\cvpubs
+    \cvsection{education}{EDUCATION}\cvedu\cvedunote
+    \cvsection{honours}{AWARDS}\cvhonours
+    % Languages is rendered only when content.tex declared at least one \lang.
+    \iffield{\cvlangs}{\cvsection{languages}{LANGUAGES}\vspace{\langtoppad}\noindent\cvlangs\par}
   \bodyend
-  \cvfooter{\cvfootertext}%
 }
 
 \setlist[itemize]{leftmargin=\cvlistindent, itemsep=\cvlistitemsep, topsep=\cvlisttopsep, parsep=\cvlistparsep}
