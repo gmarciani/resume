@@ -17,14 +17,15 @@ make setup
 ```
 
 This installs [BasicTeX](https://tug.org/mactex/morepackages.html) via
-Homebrew and adds the CTAN packages the document needs (`paracol`,
-`fontawesome5`, `enumitem`). You only need to run it once.
+Homebrew, adds the CTAN packages the document needs and building tools. 
+You only need to run it once.
 
 ## Building
 
 ```sh
 make build     # build build/resume.pdf and copy to public/ (default target)
 make view      # open the built PDF
+make watch     # build and open the PDF, then rebuild it on every change in src/ or assets/
 make clean     # remove the build/ folder
 ```
 
