@@ -1,0 +1,5 @@
+# pdfminer.six: the PDF text extractor used by the common open-source resume
+# parsers (e.g. pyresparser), so the tests read the PDF the way they do.
+# pdfminer.six uses single-number date versions, which ~= does not accept.
+pdfminer.six>=20260107
+pytest~=9.1

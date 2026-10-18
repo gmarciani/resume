@@ -24,6 +24,7 @@ You only need to run it once.
 
 ```sh
 make build     # build build/resume.pdf and copy to public/ (default target)
+make test      # check that resume parsers can extract the built PDF's text
 make view      # open the built PDF
 make watch     # build and open the PDF, then rebuild it on every change in src/ or assets/
 make clean     # remove the build/ folder
@@ -37,5 +38,6 @@ src/layout.tex     all styling: theme settings, macros, document assembly
 src/content.tex    CV content only — a flat list of element declarations
 assets/fonts/      OpenType fonts (SF Pro), embedded at build time
 assets/images/     section-header icons
+tests/             text-extraction tests on the built PDF (pdfminer.six, run in CI)
 build/             build output (git-ignored); holds resume.pdf
 ```
