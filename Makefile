@@ -12,7 +12,7 @@ PUBLIC_PDF  := $(PUBLIC_DIR)/$(PDF_NAME)
 # Let xelatex find layout.tex / content.tex and the assets under src/ and root.
 export TEXINPUTS := .:./$(SRC_DIR):
 
-.PHONY: help setup build view watch clean
+.PHONY: help setup build test view watch clean
 
 help: ## show this help message
 	@echo "Available targets:"
@@ -35,6 +35,9 @@ build: ## build resume.pdf and copy to public/ (default)
 	# Preview watch the open file and reload it automatically when it is rewritten.
 	cp $(BUILD_DIR)/main.pdf $(BUILD_PDF) && rm $(BUILD_DIR)/main.pdf
 	cp $(BUILD_PDF) $(PUBLIC_PDF)
+
+test: ## check that resume parsers can extract the built PDF's text (needs: pip install -r tests/requirements.txt)
+	python3 -m pytest tests
 
 view: ## open the built PDF (does not build; errors if missing)
 	open $(BUILD_PDF)

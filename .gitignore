@@ -38,3 +38,6 @@ build.log
 
 # Assets
 assets/positions
+# --- Python ---
+__pycache__/
+.pytest_cache/
