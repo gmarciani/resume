@@ -68,7 +68,7 @@
 %--- Layout: column ratios, gutter, page-2 offset, work split, icon/badge ----
 \newcommand{\headerratio}{0.74}  % header row: left column share (0-1)
 \newcommand{\bodyratio}{0.505}   % body rows: left column share (0-1)
-\newlength{\bodycolsep}\setlength{\bodycolsep}{8pt}         % gutter between body columns
+\newlength{\bodycolsep}\setlength{\bodycolsep}{14pt}        % gutter between body columns (at 8pt pdftotext merges lines of the two columns; below 13pt pdfminer splits skill names)
 \newlength{\pagetwooffset}\setlength{\pagetwooffset}{68pt}  % top offset aligning page 2 to page 1
 \newcommand{\cvworksplit}{1}     % first N jobs go in the left column, rest in the right
 \newcommand{\cvsectioniconsize}{9pt}                        % section-header icon height
@@ -313,9 +313,12 @@
 % Justified body paragraph. Consecutive paragraphs are separated by \bodygap;
 % the first after a section/entry gets no leading gap. Within the text, \\
 % inserts a \newlinegap-spaced new line.
+% The finite \rightskip stretch lets a hard-to-justify line end slightly short
+% instead of widening its word gaps: pdfminer (used by most resume parsers)
+% splits a line at any gap wider than ~2 glyph widths and may reorder the parts.
 \long\def\body#1{%
   \ifcvfirstbody\global\cvfirstbodyfalse\else\vspace{\bodygap}\fi
-  \noindent\begingroup\justifying\setlength{\parindent}{0pt}\let\\\bodynewline #1\par\endgroup}
+  \noindent\begingroup\justifying\rightskip=0pt plus 2em\setlength{\parindent}{0pt}\let\\\bodynewline #1\par\endgroup}
 % Education row: bold degree, school + years on one line, grade on third line.
 \newcommand{\renderedu}[3]{%
   \resetbodygap
