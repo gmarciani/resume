@@ -1,0 +1,93 @@
+name: 🧪 Test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 🛠️ Build resume.pdf
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # comment the link to the built PDF on the PR
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install LaTeX and Inkscape
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-xetex texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra inkscape
+
+      - name: Build resume.pdf
+        run: make build
+
+      - name: Upload resume.pdf
+        id: pdf
+        uses: actions/upload-artifact@v7
+        with:
+          path: build/resume.pdf
+          archive: false
+
+      - name: Link resume.pdf in the check summary
+        env:
+          URL: ${{ steps.pdf.outputs.artifact-url }}
+        run: echo "🎉 **resume.pdf is ready:** [check it out](${URL})" >> "$GITHUB_STEP_SUMMARY"
+
+      # One comment per PR, updated on every push. Skipped for PRs from forks,
+      # whose token cannot write comments.
+      - name: Comment the resume.pdf link on the PR
+        if: >-
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          URL: ${{ steps.pdf.outputs.artifact-url }}
+        run: |
+          marker='<!-- resume-pdf -->'
+          body="${marker}
+          🎉 **resume.pdf is ready:** [check it out](${URL}) · built from ${SHA}"
+          id=$(gh api --paginate "repos/${GITHUB_REPOSITORY}/issues/${PR}/comments" \
+            --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"${marker}\"))) | .id" | head -n1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${id}" -f body="$body"
+          else
+            gh api "repos/${GITHUB_REPOSITORY}/issues/${PR}/comments" -f body="$body"
+          fi
+
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-log
+          path: build/main.log
+
+  test:
+    name: 🔍 Test PDF text extraction
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+          cache: pip
+          cache-dependency-path: tests/requirements.txt
+
+      - name: Install test dependencies
+        run: pip install -r tests/requirements.txt
+
+      - name: Download resume.pdf
+        uses: actions/download-artifact@v8
+        with:
+          name: resume.pdf
+          path: build
+
+      - name: Test resume.pdf text extraction
+        run: make test
