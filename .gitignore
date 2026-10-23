@@ -41,3 +41,6 @@ assets/positions
 # --- Python ---
 __pycache__/
 .pytest_cache/
+
+# --- Python ---
+.python-version
