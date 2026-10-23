@@ -22,7 +22,7 @@ setup: ## install LaTeX dependencies (once)
 	brew install --cask basictex inkscape
 	brew install fswatch
 	sudo tlmgr update --self
-	sudo tlmgr install paracol fontawesome5 enumitem svg trimspaces transparent catchfile footmisc hyperxmp ifmtarg hyperxmp
+	sudo tlmgr install paracol fontawesome5 enumitem svg trimspaces transparent catchfile footmisc hyperxmp ifmtarg hyperxmp qrcode
 
 build: ## build resume.pdf and copy to public/ (default)
 	mkdir -p $(BUILD_DIR)

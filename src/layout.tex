@@ -21,6 +21,7 @@
 % subject/keywords. Vendored under ./vendor (see Makefile TEXINPUTS).
 \usepackage{hyperxmp}
 \usepackage{tikz}
+\usepackage{qrcode}
 
 \graphicspath{{assets/images/}}
 \svgpath{{assets/images/}}
@@ -202,6 +203,7 @@
 %   \email{giacomo.marciani@gmail.com}
 %   \linkedin{gmarciani}          % handle only; label/URL are built here
 %   \github{gmarciani}            % handle only
+%   \qrcodeurl{https://gmarciani.github.io/resume/resume.pdf} % encoded in the header QR code
 %   \makecvheader
 %
 % Any field left unset is simply omitted from the rendered header.
@@ -218,6 +220,7 @@
 \newcommand{\cvemail}{}    \newcommand{\email}[1]{\renewcommand{\cvemail}{#1}}
 \newcommand{\cvlinkedin}{} \newcommand{\linkedin}[1]{\renewcommand{\cvlinkedin}{#1}}
 \newcommand{\cvgithub}{}   \newcommand{\github}[1]{\renewcommand{\cvgithub}{#1}}
+\newcommand{\cvqrcodeurl}{} \newcommand{\qrcodeurl}[1]{\renewcommand{\cvqrcodeurl}{#1}}
 
 % \iffield{\cvxxx}{code} runs code only when field xxx was set (non-empty).
 \newcommand{\iffield}[2]{\ifx\relax#1\relax\else\ifx#1\empty\else#2\fi\fi}
@@ -236,9 +239,9 @@
     \ifx\cvlocationurl\empty\cvlocation\else\href{\cvlocationurl}{\cvlocation}\fi}}%
   \ifcvhascontact\headerblock{CONTACTS}{\cvcontactlines}\fi
   \end{paracol}%
-  \tikz[remember picture,overlay]{%
+  \iffield{\cvqrcodeurl}{\tikz[remember picture,overlay]{%
     \node[anchor=north west, inner sep=0pt] at ([xshift=320pt, yshift=-18pt]current page.north west)
-      {\includegraphics[height=50pt]{qrcode.png}};}%
+      {\qrcode[height=50pt]{\cvqrcodeurl}};}}%
   \vspace{\headerbottomgap}%
 }
 
