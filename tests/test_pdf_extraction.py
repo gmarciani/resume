@@ -30,10 +30,10 @@ PDF = Path(os.environ.get("RESUME_PDF", ROOT / "build" / "resume.pdf"))
 CONTENT = (ROOT / "src" / "content.tex").read_text()
 # Only for the page geometry (paper width, margins, column ratio, gutter) that
 # locates the column gutter in test_no_text_line_crosses_the_column_gutter:
-# the class defaults, then the document's \cvset overrides.
+# the class defaults, then the document's \resumeset overrides.
 SETTINGS = [(ROOT / "gmresume" / "gmresume.cls").read_text(), (ROOT / "src" / "main.tex").read_text()]
 
-# Section labels rendered by \makecv, in reading order (left column, then right
+# Section labels rendered by \makeresume, in reading order (left column, then right
 # column, page by page).
 SECTIONS_PAGE_1 = ["SUMMARY", "WORK EXPERIENCE", "SKILLS"]
 SECTIONS_PAGE_2 = ["PROJECTS", "PUBLICATIONS", "EDUCATION", "AWARDS", "LANGUAGES"]

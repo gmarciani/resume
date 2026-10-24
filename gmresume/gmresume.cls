@@ -1,17 +1,17 @@
 %-------------------------------------------------------------------------------
 % gmresume.cls — two-page, two-column resume class. LAYOUT & STYLE ONLY.
 % Defines page geometry, fonts, colors, and the macros a document uses to
-% declare its content; \makecv lays the declared content out. The class holds
+% declare its content; \makeresume lays the declared content out. The class holds
 % no resume content of its own.
 %
 % Requires XeLaTeX or LuaLaTeX (fontspec). Minimal document:
 %
 %   \documentclass{gmresume}
-%   \cvset{accent=22A39F}   % optional: override any setting (see SETTINGS)
+%   \resumeset{accent=22A39F}   % optional: override any setting (see SETTINGS)
 %   \name{JANE DOE}
 %   \job{Software Engineer}{Example Corp}{2020-Present}{What I did.}
 %   \begin{document}
-%   \makecv
+%   \makeresume
 %   \end{document}
 %
 % Declare the content in the preamble, before \begin{document}: the PDF
@@ -40,8 +40,8 @@
 
 %=============================================================================
 %  SETTINGS — every tunable value is a key. The class defaults are set with
-%  \cvset at the end of this block; a document overrides any of them with
-%  \cvset{key=value, ...} in its preamble, or as a class option for simple
+%  \resumeset at the end of this block; a document overrides any of them with
+%  \resumeset{key=value, ...} in its preamble, or as a class option for simple
 %  values (\documentclass[accent=FF0000]{gmresume}).
 %  Everything below this block only references these settings.
 %=============================================================================
@@ -55,11 +55,11 @@
 \newcommand{\sizebody}{}
 \newcommand{\sizefooter}{}
 \newlength{\bodycolsep}
-\newlength{\cvsectioniconsep}
-\newlength{\cvcoursebadgewidth}
-\newlength{\cvqrcodex}
-\newlength{\cvqrcodey}
-\newlength{\cvqrcodesize}
+\newlength{\resumesectioniconsep}
+\newlength{\resumecoursebadgewidth}
+\newlength{\resumeqrcodex}
+\newlength{\resumeqrcodey}
+\newlength{\resumeqrcodesize}
 \newlength{\sectiongap}
 \newlength{\sectionlabelgap}
 \newlength{\headerblockgap}
@@ -77,18 +77,18 @@
 \newlength{\skillgap}
 \newlength{\langtoppad}
 \newlength{\langlinegap}
-\newlength{\cvlistitemsep}
-\newlength{\cvlisttopsep}
-\newlength{\cvlistparsep}
+\newlength{\resumelistitemsep}
+\newlength{\resumelisttopsep}
+\newlength{\resumelistparsep}
 
 \DeclareKeys[gmresume]{
   % Page
-  paperwidth          .store = \cvpaperwidth,
-  paperheight         .store = \cvpaperheight,
-  margintop           .store = \cvmargintop,
-  marginbottom        .store = \cvmarginbottom,
-  marginleft          .store = \cvmarginleft,
-  marginright         .store = \cvmarginright,
+  paperwidth          .store = \resumepaperwidth,
+  paperheight         .store = \resumepaperheight,
+  margintop           .store = \resumemargintop,
+  marginbottom        .store = \resumemarginbottom,
+  marginleft          .store = \resumemarginleft,
+  marginright         .store = \resumemarginright,
   % Fonts
   fontdir             .store = \fontdir,
   fontregular         .store = \fontregular,
@@ -109,20 +109,20 @@
   bodysize            .code  = \renewcommand{\sizebody}{\fontsize#1\selectfont},
   footersize          .code  = \renewcommand{\sizefooter}{\fontsize#1\selectfont},
   % Text
-  linespread          .store = \cvlinespread,
-  nametracking        .store = \cvnametracking,
+  linespread          .store = \resumelinespread,
+  nametracking        .store = \resumenametracking,
   % Layout
   headerratio         .store = \headerratio,
   bodyratio           .store = \bodyratio,
   bodycolsep          .code  = \setlength{\bodycolsep}{#1},
-  worksplit           .store = \cvworksplit,
-  sectioniconsize     .store = \cvsectioniconsize,
-  sectioniconraise    .store = \cvsectioniconraise,
-  sectioniconsep      .code  = \setlength{\cvsectioniconsep}{#1},
-  coursebadgewidth    .code  = \setlength{\cvcoursebadgewidth}{#1},
-  qrcodex             .code  = \setlength{\cvqrcodex}{#1},
-  qrcodey             .code  = \setlength{\cvqrcodey}{#1},
-  qrcodesize          .code  = \setlength{\cvqrcodesize}{#1},
+  worksplit           .store = \resumeworksplit,
+  sectioniconsize     .store = \resumesectioniconsize,
+  sectioniconraise    .store = \resumesectioniconraise,
+  sectioniconsep      .code  = \setlength{\resumesectioniconsep}{#1},
+  coursebadgewidth    .code  = \setlength{\resumecoursebadgewidth}{#1},
+  qrcodex             .code  = \setlength{\resumeqrcodex}{#1},
+  qrcodey             .code  = \setlength{\resumeqrcodey}{#1},
+  qrcodesize          .code  = \setlength{\resumeqrcodesize}{#1},
   % Vertical spacing
   sectiongap          .code  = \setlength{\sectiongap}{#1},
   sectionlabelgap     .code  = \setlength{\sectionlabelgap}{#1},
@@ -141,19 +141,19 @@
   skillgap            .code  = \setlength{\skillgap}{#1},
   langtoppad          .code  = \setlength{\langtoppad}{#1},
   langlinegap         .code  = \setlength{\langlinegap}{#1},
-  langcellwidth       .store = \cvlangcellwidth,
+  langcellwidth       .store = \resumelangcellwidth,
   % Bullet lists
-  listindent          .store = \cvlistindent,
-  listitemsep         .code  = \setlength{\cvlistitemsep}{#1},
-  listtopsep          .code  = \setlength{\cvlisttopsep}{#1},
-  listparsep          .code  = \setlength{\cvlistparsep}{#1},
+  listindent          .store = \resumelistindent,
+  listitemsep         .code  = \setlength{\resumelistitemsep}{#1},
+  listtopsep          .code  = \setlength{\resumelisttopsep}{#1},
+  listparsep          .code  = \setlength{\resumelistparsep}{#1},
 }
 
-% \cvset{key=value, ...} overrides settings; use it in the document preamble.
-\newcommand{\cvset}[1]{\SetKeys[gmresume]{#1}}
+% \resumeset{key=value, ...} overrides settings; use it in the document preamble.
+\newcommand{\resumeset}[1]{\SetKeys[gmresume]{#1}}
 
 % Class defaults.
-\cvset{
+\resumeset{
   %--- Page: paper dimensions and margins ------------------------------------
   paperwidth   = 595pt,
   paperheight  = 842pt,
@@ -241,11 +241,11 @@
 % particular is ignored if set any later).
 \AddToHook{begindocument/before}{%
   \geometry{
-    paperwidth=\cvpaperwidth, paperheight=\cvpaperheight,
-    top=\cvmargintop, bottom=\cvmarginbottom,
-    left=\cvmarginleft, right=\cvmarginright
+    paperwidth=\resumepaperwidth, paperheight=\resumepaperheight,
+    top=\resumemargintop, bottom=\resumemarginbottom,
+    left=\resumemarginleft, right=\resumemarginright
   }%
-  \edef\cv@setfonts{%
+  \edef\resume@setfonts{%
     \noexpand\setmainfont{\fontregular}[%
       \ifx\fontdir\@empty\else Path = \fontdir,\fi
       BoldFont       = \fontbold,
@@ -253,10 +253,10 @@
       BoldItalicFont = \fontbolditalic]%
     \noexpand\newfontfamily\noexpand\sflight{\fontlight}[%
       \ifx\fontdir\@empty\else Path = \fontdir\fi]}%
-  \cv@setfonts
+  \resume@setfonts
   \applymetadata
   \color{primary}%
-  \linespread{\cvlinespread}%
+  \linespread{\resumelinespread}%
   \normalsize}
 
 % hyperxmp moves Author/Keywords to the XMP stream only; keeppdfinfo also
@@ -279,39 +279,39 @@
 
 % Tracks whether the next \body is the first of its group (no leading gap) or a
 % follow-on paragraph (gets \bodygap). Reset by every macro that opens a group.
-\newif\ifcvfirstbody
-\newcommand{\resetbodygap}{\global\cvfirstbodytrue}
+\newif\ifresumefirstbody
+\newcommand{\resetbodygap}{\global\resumefirstbodytrue}
 \resetbodygap
 
 %----------------- CONTENT BUCKETS (the document fills these) ----------------
 % The document declares only elements. Each element macro appends its rendered
-% form to one of these lists; \makecv (invoked once, by the document) lays the
+% form to one of these lists; \makeresume (invoked once, by the document) lays the
 % lists out into sections, columns and pages. No structure lives in the document.
 \makeatletter
 \newcommand{\appendto}[2]{\g@addto@macro#1{#2}}
 \makeatother
 % Work experience is split across the page-1 column boundary: the first
-% \cvworksplit jobs fill the left column, the rest continue in the right column
-% (reproducing the original hand-placed layout). \cvworksplit is set above.
-\newcounter{cvjobno}
-\newcommand{\cvintro}{}
-\newcommand{\cvworkleft}{}
-\newcommand{\cvworkright}{}
-\newcommand{\cvprojects}{}
-\newcommand{\cvpubs}{}
-\newcommand{\cvedu}{}
-\newcommand{\cvcourses}{}
-\newcommand{\cvhonours}{}
-\newcommand{\cvskills}{}
-\newcommand{\cvlangs}{}
-\newcommand{\cvsectionfootnote}{}
-\newcommand{\cvfootertext}{}
+% \resumeworksplit jobs fill the left column, the rest continue in the right column
+% (reproducing the original hand-placed layout). \resumeworksplit is set above.
+\newcounter{resumejobno}
+\newcommand{\resumeintro}{}
+\newcommand{\resumeworkleft}{}
+\newcommand{\resumeworkright}{}
+\newcommand{\resumeprojects}{}
+\newcommand{\resumepubs}{}
+\newcommand{\resumeedu}{}
+\newcommand{\resumecourses}{}
+\newcommand{\resumehonours}{}
+\newcommand{\resumeskills}{}
+\newcommand{\resumelangs}{}
+\newcommand{\resumesectionfootnote}{}
+\newcommand{\resumefootertext}{}
 
 %----------------- STRUCTURAL MACROS -----------------
 % Header block: name, role, tagline (left) + location/contacts (right)
 % -- Declarative header fields ---------------------------------------------
 % The document only DECLARES facts with these setters; it never touches the
-% document structure. \makecvheader renders them into the two-column header.
+% document structure. \makeresumeheader renders them into the two-column header.
 %
 %   \name{JANE DOE}
 %   \role{SOFTWARE ENGINEER}          % rendered bold
@@ -322,44 +322,44 @@
 %   \linkedin{janedoe}            % handle only; label/URL are built here
 %   \github{janedoe}              % handle only
 %   \qrcodeurl{https://example.com/resume.pdf} % encoded in the header QR code; also the PDF source URL
-%   \makecvheader
+%   \makeresumeheader
 %
 % Any field left unset is simply omitted from the rendered header.
-\newcommand{\cvname}{}     \newcommand{\name}[1]{\renewcommand{\cvname}{#1}}
-\newcommand{\cvrole}{}     \newcommand{\role}[1]{\renewcommand{\cvrole}{#1}}
-\newcommand{\cvcompany}{}  \newcommand{\company}[1]{\renewcommand{\cvcompany}{#1}}
-\newcommand{\cvheadline}{} \newcommand{\headline}[1]{\renewcommand{\cvheadline}{#1}}
+\newcommand{\resumename}{}     \newcommand{\name}[1]{\renewcommand{\resumename}{#1}}
+\newcommand{\resumerole}{}     \newcommand{\role}[1]{\renewcommand{\resumerole}{#1}}
+\newcommand{\resumecompany}{}  \newcommand{\company}[1]{\renewcommand{\resumecompany}{#1}}
+\newcommand{\resumeheadline}{} \newcommand{\headline}[1]{\renewcommand{\resumeheadline}{#1}}
 % Location accepts an optional URL: \location[https://maps...]{Boston, MA, ...}
 % When given, the location text becomes a clickable link.
-\newcommand{\cvlocation}{}
-\newcommand{\cvlocationurl}{}
+\newcommand{\resumelocation}{}
+\newcommand{\resumelocationurl}{}
 \newcommand{\location}[2][]{%
-  \renewcommand{\cvlocation}{#2}\renewcommand{\cvlocationurl}{#1}}
-\newcommand{\cvemail}{}    \newcommand{\email}[1]{\renewcommand{\cvemail}{#1}}
-\newcommand{\cvlinkedin}{} \newcommand{\linkedin}[1]{\renewcommand{\cvlinkedin}{#1}}
-\newcommand{\cvgithub}{}   \newcommand{\github}[1]{\renewcommand{\cvgithub}{#1}}
-\newcommand{\cvqrcodeurl}{} \newcommand{\qrcodeurl}[1]{\renewcommand{\cvqrcodeurl}{#1}}
+  \renewcommand{\resumelocation}{#2}\renewcommand{\resumelocationurl}{#1}}
+\newcommand{\resumeemail}{}    \newcommand{\email}[1]{\renewcommand{\resumeemail}{#1}}
+\newcommand{\resumelinkedin}{} \newcommand{\linkedin}[1]{\renewcommand{\resumelinkedin}{#1}}
+\newcommand{\resumegithub}{}   \newcommand{\github}[1]{\renewcommand{\resumegithub}{#1}}
+\newcommand{\resumeqrcodeurl}{} \newcommand{\qrcodeurl}[1]{\renewcommand{\resumeqrcodeurl}{#1}}
 
-% \iffield{\cvxxx}{code} runs code only when field xxx was set (non-empty).
+% \iffield{\resumexxx}{code} runs code only when field xxx was set (non-empty).
 \newcommand{\iffield}[2]{\ifx\relax#1\relax\else\ifx#1\empty\else#2\fi\fi}
 
 % Render the header from the declared fields.
-\newcommand{\makecvheader}{%
-  \cvcheckcontact
+\newcommand{\makeresumeheader}{%
+  \resumecheckcontact
   \columnratio{\headerratio}%
   \begin{paracol}{2}
-  {\bfseries\sizename\color{primary}\addfontfeature{LetterSpace=\cvnametracking}\cvname}\\[\namegap]
-  {\sizerole\color{accent}{\bfseries\cvrole}\iffield{\cvcompany}{ @ \cvcompany}}\\[\rolegap]
-  {\sizeheadline\color{primary}\cvheadline}
+  {\bfseries\sizename\color{primary}\addfontfeature{LetterSpace=\resumenametracking}\resumename}\\[\namegap]
+  {\sizerole\color{accent}{\bfseries\resumerole}\iffield{\resumecompany}{ @ \resumecompany}}\\[\rolegap]
+  {\sizeheadline\color{primary}\resumeheadline}
   \switchcolumn
-  \cvfirstheaderblocktrue
-  \iffield{\cvlocation}{\headerblock{LOCATION}{%
-    \ifx\cvlocationurl\empty\cvlocation\else\href{\cvlocationurl}{\cvlocation}\fi}}%
-  \ifcvhascontact\headerblock{CONTACTS}{\cvcontactlines}\fi
+  \resumefirstheaderblocktrue
+  \iffield{\resumelocation}{\headerblock{LOCATION}{%
+    \ifx\resumelocationurl\empty\resumelocation\else\href{\resumelocationurl}{\resumelocation}\fi}}%
+  \ifresumehascontact\headerblock{CONTACTS}{\resumecontactlines}\fi
   \end{paracol}%
-  \iffield{\cvqrcodeurl}{\tikz[remember picture,overlay]{%
-    \node[anchor=north west, inner sep=0pt] at ([xshift=\cvqrcodex, yshift=-\cvqrcodey]current page.north west)
-      {\qrcode[height=\cvqrcodesize]{\cvqrcodeurl}};}}%
+  \iffield{\resumeqrcodeurl}{\tikz[remember picture,overlay]{%
+    \node[anchor=north west, inner sep=0pt] at ([xshift=\resumeqrcodex, yshift=-\resumeqrcodey]current page.north west)
+      {\qrcode[height=\resumeqrcodesize]{\resumeqrcodeurl}};}}%
   \vspace{\headerbottomgap}%
 }
 
@@ -373,51 +373,51 @@
 %   \pdfsubject{Software Engineer - Distributed Systems}
 %   \pdfkeywords{Software Engineer, Distributed Systems, Python}
 %   \pdflanguage{en}
-\newcommand{\cvpdftitle}{}    \newcommand{\pdftitle}[1]{\renewcommand{\cvpdftitle}{#1}}
-\newcommand{\cvpdfauthor}{}   \newcommand{\pdfauthor}[1]{\renewcommand{\cvpdfauthor}{#1}}
-\newcommand{\cvpdfsubject}{}  \newcommand{\pdfsubject}[1]{\renewcommand{\cvpdfsubject}{#1}}
-\newcommand{\cvpdfkeywords}{} \newcommand{\pdfkeywords}[1]{\renewcommand{\cvpdfkeywords}{#1}}
-\newcommand{\cvpdflanguage}{} \newcommand{\pdflanguage}[1]{\renewcommand{\cvpdflanguage}{#1}}
+\newcommand{\resumepdftitle}{}    \newcommand{\pdftitle}[1]{\renewcommand{\resumepdftitle}{#1}}
+\newcommand{\resumepdfauthor}{}   \newcommand{\pdfauthor}[1]{\renewcommand{\resumepdfauthor}{#1}}
+\newcommand{\resumepdfsubject}{}  \newcommand{\pdfsubject}[1]{\renewcommand{\resumepdfsubject}{#1}}
+\newcommand{\resumepdfkeywords}{} \newcommand{\pdfkeywords}[1]{\renewcommand{\resumepdfkeywords}{#1}}
+\newcommand{\resumepdflanguage}{} \newcommand{\pdflanguage}[1]{\renewcommand{\resumepdflanguage}{#1}}
 
 % Write the declared metadata into the PDF. Called at the very start of
 % \begin{document} (see APPLIES THE SETTINGS ABOVE), after the document has
 % declared its content in the preamble.
 \newcommand{\applymetadata}{%
   \hypersetup{
-    pdftitle    = {\cvpdftitle},
-    pdfauthor   = {\cvpdfauthor},
-    pdfsubject  = {\cvpdfsubject},
-    pdfkeywords = {\cvpdfkeywords},
-    pdflang     = {\cvpdflanguage},
-    pdfsource   = {\cvqrcodeurl}
+    pdftitle    = {\resumepdftitle},
+    pdfauthor   = {\resumepdfauthor},
+    pdfsubject  = {\resumepdfsubject},
+    pdfkeywords = {\resumepdfkeywords},
+    pdflang     = {\resumepdflanguage},
+    pdfsource   = {\resumeqrcodeurl}
   }}
 
 % True when at least one contact handle was declared.
-\newif\ifcvhascontact
-\newcommand{\cvcheckcontact}{%
-  \iffield{\cvemail}{\global\cvhascontacttrue}%
-  \iffield{\cvlinkedin}{\global\cvhascontacttrue}%
-  \iffield{\cvgithub}{\global\cvhascontacttrue}}
+\newif\ifresumehascontact
+\newcommand{\resumecheckcontact}{%
+  \iffield{\resumeemail}{\global\resumehascontacttrue}%
+  \iffield{\resumelinkedin}{\global\resumehascontacttrue}%
+  \iffield{\resumegithub}{\global\resumehascontacttrue}}
 
 % Assemble the contact lines from whichever handles were declared.
 % Show full URLs as visible text so text-only parsers capture them (not just
 % the embedded hyperlink target).
-\newcommand{\cvcontactlines}{%
-  \iffield{\cvemail}{\href{mailto:\cvemail}{\cvemail}\\[\contactlinegap]}%
-  \iffield{\cvlinkedin}{\href{https://linkedin.com/in/\cvlinkedin}{linkedin.com/in/\cvlinkedin}\\[\contactlinegap]}%
-  \iffield{\cvgithub}{\href{https://github.com/\cvgithub}{github.com/\cvgithub}}%
+\newcommand{\resumecontactlines}{%
+  \iffield{\resumeemail}{\href{mailto:\resumeemail}{\resumeemail}\\[\contactlinegap]}%
+  \iffield{\resumelinkedin}{\href{https://linkedin.com/in/\resumelinkedin}{linkedin.com/in/\resumelinkedin}\\[\contactlinegap]}%
+  \iffield{\resumegithub}{\href{https://github.com/\resumegithub}{github.com/\resumegithub}}%
 }
 
 % A labelled block for the header right column (e.g. Location, Contacts).
 % #1 = label  #2 = lines. A leading gap separates stacked blocks; the first
 % block in the column gets none.
-\newif\ifcvfirstheaderblock
+\newif\ifresumefirstheaderblock
 \newcommand{\headerblock}[2]{%
-  \ifcvfirstheaderblock\global\cvfirstheaderblockfalse\else\vspace{\headerblockgap}\fi
+  \ifresumefirstheaderblock\global\resumefirstheaderblockfalse\else\vspace{\headerblockgap}\fi
   {\color{accent}\sizelabel #1}\\[\headerblocklabelgap]{\sizeheadertext #2\par}}
 
-%----------------- STRUCTURAL SKELETON (used only by \makecv) -----------------
-% The document never calls any of these; \makecv assembles the document.
+%----------------- STRUCTURAL SKELETON (used only by \makeresume) -----------------
+% The document never calls any of these; \makeresume assembles the document.
 % Open / close the two independent body columns
 \newcommand{\bodystart}{%
   \columnratio{\bodyratio}\setlength{\columnsep}{\bodycolsep}\begin{paracol}{2}}
@@ -425,21 +425,21 @@
 % Switch from the left body column to the right one
 \newcommand{\rightcolumn}{\switchcolumn}
 % Page break that repeats the header on the new page
-\newcommand{\cvnewpage}{\newpage\makecvheader}
+\newcommand{\resumenewpage}{\newpage\makeresumeheader}
 
 % Section header: icon + accent-colored uppercase label
 % #1 = icon name (icons/gmresume-<name>.pdf, installed with the class), #2 = label
-\newcommand{\cvsection}[2]{%
+\newcommand{\resumesection}[2]{%
   \resetbodygap
   \vspace{\sectiongap}%
-  \noindent\raisebox{\cvsectioniconraise}{\includegraphics[height=\cvsectioniconsize]{gmresume-#1}}\hspace{\cvsectioniconsep}%
+  \noindent\raisebox{\resumesectioniconraise}{\includegraphics[height=\resumesectioniconsize]{gmresume-#1}}\hspace{\resumesectioniconsep}%
   {\color{accent}\sizelabel #2}\par
   \vspace{\sectionlabelgap}%
 }
 
 %----------------- ELEMENT RENDERERS (private) -----------------
 % These typeset one element. The public element macros below only APPEND a
-% call to one of these into a section bucket; nothing is typeset until \makecv.
+% call to one of these into a section bucket; nothing is typeset until \makeresume.
 
 % Entry: bold title, secondary meta line. Optional URL makes the title a clickable
 % teal link.  \entry[url]{Title}{Meta}
@@ -467,7 +467,7 @@
 % instead of widening its word gaps: pdfminer (used by most resume parsers)
 % splits a line at any gap wider than ~2 glyph widths and may reorder the parts.
 \long\def\body#1{%
-  \ifcvfirstbody\global\cvfirstbodyfalse\else\vspace{\bodygap}\fi
+  \ifresumefirstbody\global\resumefirstbodyfalse\else\vspace{\bodygap}\fi
   \noindent\begingroup\justifying\rightskip=0pt plus 2em\setlength{\parindent}{0pt}\let\\\bodynewline #1\par\endgroup}
 % Education row: bold degree, school + years on one line, grade on third line.
 \newcommand{\renderedu}[3]{%
@@ -477,7 +477,7 @@
   {\color{secondary}#3}\par}
 % Course row: name (left) + teal grade badge (right).
 \newcommand{\rendercourse}[2]{%
-  \noindent#1\hfill\colorbox{accent}{\makebox[\cvcoursebadgewidth][c]{\color{white}\bfseries#2}}\par
+  \noindent#1\hfill\colorbox{accent}{\makebox[\resumecoursebadgewidth][c]{\color{white}\bfseries#2}}\par
   \vspace{\coursegap}}
 % Skill row: bold category + description.
 \newcommand{\renderskill}[2]{%
@@ -485,11 +485,11 @@
 % One language proficiency as a half-column cell; consecutive cells sit side by
 % side, so declaring two languages reproduces the original paired row.
 \newcommand{\renderlanguage}[2]{%
-  \begin{minipage}[t]{\cvlangcellwidth\columnwidth}{\bfseries #1}\\[\langlinegap]{\color{secondary}#2}\end{minipage}}
+  \begin{minipage}[t]{\resumelangcellwidth\columnwidth}{\bfseries #1}\\[\langlinegap]{\color{secondary}#2}\end{minipage}}
 % Small-print note rendered directly under the Education section (same column),
 % so a starred remark stays next to the entry it refers to.
-\newcommand{\cvedunote}{%
-  \iffield{\cvfootertext}{\vspace{\edugap}{\sflight\sizefooter\color{secondary}\cvfootertext\par}}}
+\newcommand{\resumeedunote}{%
+  \iffield{\resumefootertext}{\vspace{\edugap}{\sflight\sizefooter\color{secondary}\resumefootertext\par}}}
 
 %----------------- ELEMENT DECLARATIONS (the document uses only these) -------
 % Each macro appends its element to the relevant section bucket. The content is
@@ -508,52 +508,52 @@
 %   \footer{Small-print note shown under the Education section.}
 % Introduction: a single element. Like every body, \\ starts a new line
 % (spaced by \newlinegap). Declare exactly one \introduction.
-\long\def\introduction#1{\appendto\cvintro{\body{#1}}}
-% Jobs route to the left column bucket until \cvworksplit is reached, then to
+\long\def\introduction#1{\appendto\resumeintro{\body{#1}}}
+% Jobs route to the left column bucket until \resumeworksplit is reached, then to
 % the right column bucket — so the document just lists jobs in order.
 \newcommand{\job}[5][]{%
-  \stepcounter{cvjobno}%
-  \ifnum\value{cvjobno}>\cvworksplit\relax
-    \appendto\cvworkright{\entry[#1]{#2}{#3, #4}\body{#5}}%
+  \stepcounter{resumejobno}%
+  \ifnum\value{resumejobno}>\resumeworksplit\relax
+    \appendto\resumeworkright{\entry[#1]{#2}{#3, #4}\body{#5}}%
   \else
-    \appendto\cvworkleft{\entry[#1]{#2}{#3, #4}\body{#5}}%
+    \appendto\resumeworkleft{\entry[#1]{#2}{#3, #4}\body{#5}}%
   \fi}
-\newcommand{\project}[4][]{\appendto\cvprojects{\entryprimary[#1]{#2}{#3}\body{#4}}}
-\newcommand{\sectionfootnote}[1]{\appendto\cvsectionfootnote{\body{\color{secondary}\itshape #1}}}
-\newcommand{\publication}[3][]{\appendto\cvpubs{\entryprimary[#1]{#2}{#3}}}
-\newcommand{\honour}[2]{\appendto\cvhonours{\entry{#1}{#2}}}
-\newcommand{\education}[3]{\appendto\cvedu{\renderedu{#1}{#2}{#3}}}
-\newcommand{\course}[2]{\appendto\cvcourses{\rendercourse{#1}{#2}}}
-\newcommand{\skill}[2]{\appendto\cvskills{\renderskill{#1}{#2}}}
-\newcommand{\lang}[2]{\appendto\cvlangs{\renderlanguage{#1}{#2}}}
-\newcommand{\footer}[1]{\renewcommand{\cvfootertext}{#1}}
+\newcommand{\project}[4][]{\appendto\resumeprojects{\entryprimary[#1]{#2}{#3}\body{#4}}}
+\newcommand{\sectionfootnote}[1]{\appendto\resumesectionfootnote{\body{\color{secondary}\itshape #1}}}
+\newcommand{\publication}[3][]{\appendto\resumepubs{\entryprimary[#1]{#2}{#3}}}
+\newcommand{\honour}[2]{\appendto\resumehonours{\entry{#1}{#2}}}
+\newcommand{\education}[3]{\appendto\resumeedu{\renderedu{#1}{#2}{#3}}}
+\newcommand{\course}[2]{\appendto\resumecourses{\rendercourse{#1}{#2}}}
+\newcommand{\skill}[2]{\appendto\resumeskills{\renderskill{#1}{#2}}}
+\newcommand{\lang}[2]{\appendto\resumelangs{\renderlanguage{#1}{#2}}}
+\newcommand{\footer}[1]{\renewcommand{\resumefootertext}{#1}}
 
 %----------------- DOCUMENT ASSEMBLY -----------------
-% Renders the whole CV from the declared header fields and section buckets.
+% Renders the whole resume from the declared header fields and section buckets.
 % Fixed placement: page 1 (Intro+Work | Work+Skills),
 % page 2 (Projects | Publications+Education+Awards+Languages).
-\newcommand{\makecv}{%
-  \makecvheader
+\newcommand{\makeresume}{%
+  \makeresumeheader
   % --- Page 1 ---
   \bodystart
-    \cvsection{introduction}{SUMMARY}\cvintro
-    \cvsection{work}{WORK EXPERIENCE}\cvworkleft
+    \resumesection{introduction}{SUMMARY}\resumeintro
+    \resumesection{work}{WORK EXPERIENCE}\resumeworkleft
   \rightcolumn
-    \cvworkright
-    \cvsection{skills}{SKILLS}\cvskills
+    \resumeworkright
+    \resumesection{skills}{SKILLS}\resumeskills
   \bodyend
   % --- Page 2 ---
-  \cvnewpage
+  \resumenewpage
   \bodystart
-    \cvsection{projects}{PROJECTS}\cvprojects\cvsectionfootnote
-    %\cvsection{courses}{MAIN COURSES}\cvcourses
+    \resumesection{projects}{PROJECTS}\resumeprojects\resumesectionfootnote
+    %\resumesection{courses}{MAIN COURSES}\resumecourses
   \rightcolumn
-    \cvsection{publications}{PUBLICATIONS}\cvpubs
-    \cvsection{education}{EDUCATION}\cvedu\cvedunote
-    \cvsection{honours}{AWARDS}\cvhonours
+    \resumesection{publications}{PUBLICATIONS}\resumepubs
+    \resumesection{education}{EDUCATION}\resumeedu\resumeedunote
+    \resumesection{honours}{AWARDS}\resumehonours
     % Languages is rendered only when the document declared at least one \lang.
-    \iffield{\cvlangs}{\cvsection{languages}{LANGUAGES}\vspace{\langtoppad}\noindent\cvlangs\par}
+    \iffield{\resumelangs}{\resumesection{languages}{LANGUAGES}\vspace{\langtoppad}\noindent\resumelangs\par}
   \bodyend
 }
 
-\setlist[itemize]{leftmargin=\cvlistindent, itemsep=\cvlistitemsep, topsep=\cvlisttopsep, parsep=\cvlistparsep}
+\setlist[itemize]{leftmargin=\resumelistindent, itemsep=\resumelistitemsep, topsep=\resumelisttopsep, parsep=\resumelistparsep}

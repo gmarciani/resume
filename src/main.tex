@@ -3,14 +3,14 @@
 %   mkdir -p build && xelatex -output-directory=build src/main.tex
 % (twice, for the QR code position), or with: make build
 %
-% Layout/style lives in  gmresume.cls  (how the CV looks; reusable class)
-% Content lives in        content.tex   (what the CV says)
+% Layout/style lives in  gmresume.cls  (how the resume looks; reusable class)
+% Content lives in        content.tex   (what the resume says)
 % This file only picks the class settings that differ from its defaults.
 %-------------------------------------------------------------------------------
 \documentclass{gmresume}
 
 % SF Pro, from this repository (not distributed with the class).
-\cvset{
+\resumeset{
   fontdir        = assets/fonts/,
   fontregular    = SF-Pro-Text-Regular.otf,
   fontbold       = SF-Pro-Text-Semibold.otf,
@@ -25,6 +25,6 @@
 \input{src/content.tex}
 
 \begin{document}
-% \makecv assembles the declared elements into the laid-out document.
-\makecv
+% \makeresume assembles the declared elements into the laid-out document.
+\makeresume
 \end{document}

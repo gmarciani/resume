@@ -49,16 +49,16 @@ its own. To write your own resume with it:
    it from any folder with XeLaTeX or LuaLaTeX.
 
 3. Customize the content by declaring it in the preamble with the macros documented
-   in [`gmresume/gmresume.cls`](gmresume/gmresume.cls), then call `\makecv` in
-   the body; override any layout setting with `\cvset{key=value, ...}`.
+   in [`gmresume/gmresume.cls`](gmresume/gmresume.cls), then call `\makeresume` in
+   the body; override any layout setting with `\resumeset{key=value, ...}`.
 
 ## Project Structure
 
 ```
 .
 ├── src/
-│   ├── main.tex          entry point (gmresume class + font settings, inputs content, then \makecv)
-│   └── content.tex       CV content only — a flat list of element declarations
+│   ├── main.tex          entry point (gmresume class + font settings, inputs content, then \makeresume)
+│   └── content.tex       Resume content only — a flat list of element declarations
 ├── gmresume/
 │   ├── gmresume.cls      the reusable class: settings, macros, document assembly
 │   ├── assets/           section-header icons, SVG sources
