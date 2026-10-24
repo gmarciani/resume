@@ -2,7 +2,7 @@
 % layout.tex — LAYOUT & STYLE ONLY (no content)
 % Defines document class, page geometry, fonts, colors and the macros used by
 % content.tex. Edit this file to change how the CV looks.
-% Do not put CV content here. Entry point is resume.tex.
+% Do not put CV content here. Entry point is main.tex.
 %-------------------------------------------------------------------------------
 \documentclass[8pt]{extarticle} % base font size: change 8pt here
 
@@ -76,6 +76,9 @@
 \newcommand{\cvsectioniconraise}{-0.18em}                   % icon vertical nudge onto the label baseline
 \newlength{\cvsectioniconsep}\setlength{\cvsectioniconsep}{6pt}   % gap icon -> section label
 \newlength{\cvcoursebadgewidth}\setlength{\cvcoursebadgewidth}{13pt} % course grade badge width
+\newlength{\cvqrcodex}\setlength{\cvqrcodex}{320pt}             % header QR code: offset from the page left edge
+\newlength{\cvqrcodey}\setlength{\cvqrcodey}{18pt}              % header QR code: offset from the page top edge
+\newlength{\cvqrcodesize}\setlength{\cvqrcodesize}{50pt}        % header QR code: side length
 
 %--- Vertical spacing --------------------------------------------------------
 % content.tex never sets \vspace itself; these lengths control every gap and the
@@ -129,20 +132,11 @@
 ]
 \newfontfamily\sflight{\fontlight}[Path=\fontdir]
 
-% PDF document metadata. LinkedIn and many HR/ATS tools read these fields;
-% pdfkeywords carries role-relevant terms for keyword matching.
-\hypersetup{
-  % hyperxmp moves Author/Keywords to the XMP stream only; keeppdfinfo also
-  % keeps them in the classic Info dictionary, which LinkedIn and ATS tools read.
-  keeppdfinfo = true,
-  pdftitle    = {Giacomo Marciani - Resume},
-  pdfauthor   = {Giacomo Marciani},
-  pdfsubject  = {Senior Software Engineer - High Performance Computing, Distributed Systems, Cloud Architecture},
-  pdfkeywords = {Senior Software Engineer, High Performance Computing, HPC, AWS, Amazon Web Services, AWS ParallelCluster, NICE EnginFrame, Elastic Inference, Elastic Graphics, Slurm, MPI, CUDA, NVIDIA GPU, GPU Acceleration, Lustre, EFA, EC2, ECS, Serverless, Distributed Systems, Cloud Architecture, Infrastructure as Code, Terraform, CloudFormation, Docker, Linux, Kubernetes, CI/CD, Jenkins, Observability, Grafana, Prometheus, Incident Response, On-call, Security, Threat Modeling, Big Data, Stream Processing, Flink, Kafka, Hadoop, Machine Learning, Python, Java, React, Open Source, Technical Leadership, System Design, Roadmap, Mentoring, Hiring, Scrum, Boston},
-  pdflang     = {en},
-  % dc:source in the XMP stream; set to the canonical URL instead of the .tex filename.
-  pdfsource   = {https://gmarciani.github.io/resume/resume.pdf}
-}
+% hyperxmp moves Author/Keywords to the XMP stream only; keeppdfinfo also
+% keeps them in the classic Info dictionary, which LinkedIn and ATS tools read.
+% The metadata values themselves are declared in content.tex (see
+% \applymetadata below).
+\hypersetup{keeppdfinfo = true}
 
 % Prevent line-break hyphenation from splitting words in the text layer
 % (e.g. "High Per-formance Computing"), which breaks ATS/AI keyword matching.
@@ -195,15 +189,15 @@
 % content.tex only DECLARES facts with these setters; it never touches the
 % document structure. \makecvheader renders them into the two-column header.
 %
-%   \name{GIACOMO MARCIANI}
-%   \role{SENIOR SOFTWARE ENGINEER}   % rendered bold
-%   \company{Amazon Web Services}     % rendered normal weight, after "@"
-%   \headline{Building High Performance Computing in the Cloud}
-%   \location[https://maps.google.com/...]{Boston, MA, United States} % URL optional
-%   \email{giacomo.marciani@gmail.com}
-%   \linkedin{gmarciani}          % handle only; label/URL are built here
-%   \github{gmarciani}            % handle only
-%   \qrcodeurl{https://gmarciani.github.io/resume/resume.pdf} % encoded in the header QR code
+%   \name{JANE DOE}
+%   \role{SOFTWARE ENGINEER}          % rendered bold
+%   \company{Example Corp}            % rendered normal weight, after "@"
+%   \headline{One-line professional tagline}
+%   \location[https://maps.google.com/...]{City, Country} % URL optional
+%   \email{jane.doe@example.com}
+%   \linkedin{janedoe}            % handle only; label/URL are built here
+%   \github{janedoe}              % handle only
+%   \qrcodeurl{https://example.com/resume.pdf} % encoded in the header QR code; also the PDF source URL
 %   \makecvheader
 %
 % Any field left unset is simply omitted from the rendered header.
@@ -240,10 +234,41 @@
   \ifcvhascontact\headerblock{CONTACTS}{\cvcontactlines}\fi
   \end{paracol}%
   \iffield{\cvqrcodeurl}{\tikz[remember picture,overlay]{%
-    \node[anchor=north west, inner sep=0pt] at ([xshift=320pt, yshift=-18pt]current page.north west)
-      {\qrcode[height=50pt]{\cvqrcodeurl}};}}%
+    \node[anchor=north west, inner sep=0pt] at ([xshift=\cvqrcodex, yshift=-\cvqrcodey]current page.north west)
+      {\qrcode[height=\cvqrcodesize]{\cvqrcodeurl}};}}%
   \vspace{\headerbottomgap}%
 }
+
+% -- Declarative PDF metadata fields ---------------------------------------
+% LinkedIn and many HR/ATS tools read these fields; \pdfkeywords carries
+% role-relevant terms for keyword matching. \qrcodeurl doubles as dc:source
+% (the canonical URL) in the XMP stream.
+%
+%   \pdftitle{Jane Doe - Resume}
+%   \pdfauthor{Jane Doe}
+%   \pdfsubject{Software Engineer - Distributed Systems}
+%   \pdfkeywords{Software Engineer, Distributed Systems, Python}
+%   \pdflanguage{en}
+\newcommand{\cvpdftitle}{}    \newcommand{\pdftitle}[1]{\renewcommand{\cvpdftitle}{#1}}
+\newcommand{\cvpdfauthor}{}   \newcommand{\pdfauthor}[1]{\renewcommand{\cvpdfauthor}{#1}}
+\newcommand{\cvpdfsubject}{}  \newcommand{\pdfsubject}[1]{\renewcommand{\cvpdfsubject}{#1}}
+\newcommand{\cvpdfkeywords}{} \newcommand{\pdfkeywords}[1]{\renewcommand{\cvpdfkeywords}{#1}}
+\newcommand{\cvpdflanguage}{} \newcommand{\pdflanguage}[1]{\renewcommand{\cvpdflanguage}{#1}}
+
+% Write the declared metadata into the PDF. Runs at the very start of
+% \begin{document} (begindocument/before, ahead of every package's
+% \AtBeginDocument code), after main.tex has read content.tex in the preamble:
+% hyperref and hyperxmp read pdflang there, so setting it any later is ignored.
+\AddToHook{begindocument/before}{\applymetadata}
+\newcommand{\applymetadata}{%
+  \hypersetup{
+    pdftitle    = {\cvpdftitle},
+    pdfauthor   = {\cvpdfauthor},
+    pdfsubject  = {\cvpdfsubject},
+    pdfkeywords = {\cvpdfkeywords},
+    pdflang     = {\cvpdflanguage},
+    pdfsource   = {\cvqrcodeurl}
+  }}
 
 % True when at least one contact handle was declared.
 \newif\ifcvhascontact
