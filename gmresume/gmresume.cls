@@ -1,140 +1,267 @@
 %-------------------------------------------------------------------------------
-% layout.tex — LAYOUT & STYLE ONLY (no content)
-% Defines document class, page geometry, fonts, colors and the macros used by
-% content.tex. Edit this file to change how the CV looks.
-% Do not put CV content here. Entry point is main.tex.
+% gmresume.cls — two-page, two-column resume class. LAYOUT & STYLE ONLY.
+% Defines page geometry, fonts, colors, and the macros a document uses to
+% declare its content; \makecv lays the declared content out. The class holds
+% no resume content of its own.
+%
+% Requires XeLaTeX or LuaLaTeX (fontspec). Minimal document:
+%
+%   \documentclass{gmresume}
+%   \cvset{accent=22A39F}   % optional: override any setting (see SETTINGS)
+%   \name{JANE DOE}
+%   \job{Software Engineer}{Example Corp}{2020-Present}{What I did.}
+%   \begin{document}
+%   \makecv
+%   \end{document}
+%
+% Declare the content in the preamble, before \begin{document}: the PDF
+% metadata it sets must be in place when the document starts.
 %-------------------------------------------------------------------------------
-\documentclass[8pt]{extarticle} % base font size: change 8pt here
+\NeedsTeXFormat{LaTeX2e}[2022-11-01] % \DeclareKeys, \SetKeys, \ProcessKeyOptions
+\ProvidesClass{gmresume}[2026/10/24 v1.0.0 Two-page two-column resume]
 
-\usepackage{geometry} % page size/margins are configured from settings below
-\usepackage{fontspec}
-\usepackage{paracol}
-\usepackage{xcolor}
-\usepackage{graphicx}
-\usepackage[inkscapepath=build/svg-inkscape]{svg}
-\usepackage{fontawesome5}
-\usepackage{enumitem}
-\usepackage{ragged2e}
-\usepackage[hidelinks]{hyperref}
+\LoadClass[8pt]{extarticle} % base font size
+
+\RequirePackage{geometry} % page size/margins are configured from the settings below
+\RequirePackage{fontspec}
+\RequirePackage{paracol}
+\RequirePackage{xcolor}
+\RequirePackage{graphicx}
+\RequirePackage{fontawesome5}
+\RequirePackage{enumitem}
+\RequirePackage{ragged2e}
+\RequirePackage[hidelinks]{hyperref}
 % hyperxmp writes an XMP metadata stream (Dublin Core) mirroring the \hypersetup
 % Info fields, so web crawlers and document systems can read title/author/
-% subject/keywords. Vendored under ./vendor (see Makefile TEXINPUTS).
-\usepackage{hyperxmp}
-\usepackage{tikz}
-\usepackage{qrcode}
-
-\graphicspath{{assets/images/}}
-\svgpath{{assets/images/}}
+% subject/keywords.
+\RequirePackage{hyperxmp}
+\RequirePackage{tikz}
+\RequirePackage{qrcode}
 
 %=============================================================================
-%  CUSTOMIZE HERE — every tunable setting lives in this one block.
-%  Everything below it only references these constants, so you should not need
-%  to edit hex values, font files, sizes, ratios, or spacing anywhere else.
+%  SETTINGS — every tunable value is a key. The class defaults are set with
+%  \cvset at the end of this block; a document overrides any of them with
+%  \cvset{key=value, ...} in its preamble, or as a class option for simple
+%  values (\documentclass[accent=FF0000]{gmresume}).
+%  Everything below this block only references these settings.
 %=============================================================================
 
-%--- Page: paper dimensions and margins --------------------------------------
-\newcommand{\cvpaperwidth}{595pt}
-\newcommand{\cvpaperheight}{842pt}
-\newcommand{\cvmargintop}{22pt}
-\newcommand{\cvmarginbottom}{20pt}
-\newcommand{\cvmarginleft}{26pt}
-\newcommand{\cvmarginright}{19pt}
+% Storage for the settings (filled by the keys).
+\newcommand{\sizename}{}
+\newcommand{\sizerole}{}
+\newcommand{\sizeheadline}{}
+\newcommand{\sizelabel}{}
+\newcommand{\sizeheadertext}{}
+\newcommand{\sizebody}{}
+\newcommand{\sizefooter}{}
+\newlength{\bodycolsep}
+\newlength{\cvsectioniconsep}
+\newlength{\cvcoursebadgewidth}
+\newlength{\cvqrcodex}
+\newlength{\cvqrcodey}
+\newlength{\cvqrcodesize}
+\newlength{\sectiongap}
+\newlength{\sectionlabelgap}
+\newlength{\headerblockgap}
+\newlength{\headerblocklabelgap}
+\newlength{\namegap}
+\newlength{\rolegap}
+\newlength{\headerbottomgap}
+\newlength{\contactlinegap}
+\newlength{\bodygap}
+\newlength{\newlinegap}
+\newlength{\entrytopgap}
+\newlength{\entrymetagap}
+\newlength{\edugap}
+\newlength{\coursegap}
+\newlength{\skillgap}
+\newlength{\langtoppad}
+\newlength{\langlinegap}
+\newlength{\cvlistitemsep}
+\newlength{\cvlisttopsep}
+\newlength{\cvlistparsep}
 
-%--- Fonts: point these at any local .otf/.ttf files under \fontdir ----------
-\newcommand{\fontdir}{assets/fonts/}
-\newcommand{\fontregular}{SF-Pro-Text-Regular.otf}
-\newcommand{\fontbold}{SF-Pro-Text-Semibold.otf}
-\newcommand{\fontitalic}{SF-Pro-Text-RegularItalic.otf}
-\newcommand{\fontbolditalic}{SF-Pro-Text-SemiboldItalic.otf}
-\newcommand{\fontlight}{SF-Pro-Text-Light.otf}
+\DeclareKeys[gmresume]{
+  % Page
+  paperwidth          .store = \cvpaperwidth,
+  paperheight         .store = \cvpaperheight,
+  margintop           .store = \cvmargintop,
+  marginbottom        .store = \cvmarginbottom,
+  marginleft          .store = \cvmarginleft,
+  marginright         .store = \cvmarginright,
+  % Fonts
+  fontdir             .store = \fontdir,
+  fontregular         .store = \fontregular,
+  fontbold            .store = \fontbold,
+  fontitalic          .store = \fontitalic,
+  fontbolditalic      .store = \fontbolditalic,
+  fontlight           .store = \fontlight,
+  % Colors
+  accent              .code  = \definecolor{accent}{HTML}{#1},
+  primary             .code  = \definecolor{primary}{HTML}{#1},
+  secondary           .code  = \definecolor{secondary}{HTML}{#1},
+  % Font sizes, each as {size}{leading}
+  namesize            .code  = \renewcommand{\sizename}{\fontsize#1\selectfont},
+  rolesize            .code  = \renewcommand{\sizerole}{\fontsize#1\selectfont},
+  headlinesize        .code  = \renewcommand{\sizeheadline}{\fontsize#1\selectfont},
+  labelsize           .code  = \renewcommand{\sizelabel}{\fontsize#1\selectfont},
+  headertextsize      .code  = \renewcommand{\sizeheadertext}{\fontsize#1\selectfont},
+  bodysize            .code  = \renewcommand{\sizebody}{\fontsize#1\selectfont},
+  footersize          .code  = \renewcommand{\sizefooter}{\fontsize#1\selectfont},
+  % Text
+  linespread          .store = \cvlinespread,
+  nametracking        .store = \cvnametracking,
+  % Layout
+  headerratio         .store = \headerratio,
+  bodyratio           .store = \bodyratio,
+  bodycolsep          .code  = \setlength{\bodycolsep}{#1},
+  worksplit           .store = \cvworksplit,
+  sectioniconsize     .store = \cvsectioniconsize,
+  sectioniconraise    .store = \cvsectioniconraise,
+  sectioniconsep      .code  = \setlength{\cvsectioniconsep}{#1},
+  coursebadgewidth    .code  = \setlength{\cvcoursebadgewidth}{#1},
+  qrcodex             .code  = \setlength{\cvqrcodex}{#1},
+  qrcodey             .code  = \setlength{\cvqrcodey}{#1},
+  qrcodesize          .code  = \setlength{\cvqrcodesize}{#1},
+  % Vertical spacing
+  sectiongap          .code  = \setlength{\sectiongap}{#1},
+  sectionlabelgap     .code  = \setlength{\sectionlabelgap}{#1},
+  headerblockgap      .code  = \setlength{\headerblockgap}{#1},
+  headerblocklabelgap .code  = \setlength{\headerblocklabelgap}{#1},
+  namegap             .code  = \setlength{\namegap}{#1},
+  rolegap             .code  = \setlength{\rolegap}{#1},
+  headerbottomgap     .code  = \setlength{\headerbottomgap}{#1},
+  contactlinegap      .code  = \setlength{\contactlinegap}{#1},
+  bodygap             .code  = \setlength{\bodygap}{#1},
+  newlinegap          .code  = \setlength{\newlinegap}{#1},
+  entrytopgap         .code  = \setlength{\entrytopgap}{#1},
+  entrymetagap        .code  = \setlength{\entrymetagap}{#1},
+  edugap              .code  = \setlength{\edugap}{#1},
+  coursegap           .code  = \setlength{\coursegap}{#1},
+  skillgap            .code  = \setlength{\skillgap}{#1},
+  langtoppad          .code  = \setlength{\langtoppad}{#1},
+  langlinegap         .code  = \setlength{\langlinegap}{#1},
+  langcellwidth       .store = \cvlangcellwidth,
+  % Bullet lists
+  listindent          .store = \cvlistindent,
+  listitemsep         .code  = \setlength{\cvlistitemsep}{#1},
+  listtopsep          .code  = \setlength{\cvlisttopsep}{#1},
+  listparsep          .code  = \setlength{\cvlistparsep}{#1},
+}
 
-%--- Colors (hex, without the leading #) -------------------------------------
-\definecolor{accent}{HTML}{22A39F} % section headers, role line, links, badges
-\definecolor{primary}{HTML}{1A1A1A}    % primary text (name, titles, headline, body)
-\definecolor{secondary}{HTML}{666666}  % secondary text (education, footer, entry meta)
+% \cvset{key=value, ...} overrides settings; use it in the document preamble.
+\newcommand{\cvset}[1]{\SetKeys[gmresume]{#1}}
 
-%--- Font sizes as {size}{leading} in pt -------------------------------------
-\newcommand{\sizename}{\fontsize{23pt}{25pt}\selectfont}     % header name
-\newcommand{\sizerole}{\fontsize{9pt}{11pt}\selectfont}      % header role line
-\newcommand{\sizeheadline}{\fontsize{10pt}{12pt}\selectfont} % header tagline
-\newcommand{\sizelabel}{\fontsize{8pt}{8pt}\selectfont}      % section + block labels
-\newcommand{\sizeheadertext}{\fontsize{8pt}{10pt}\selectfont} % header block lines (location, contacts)
-\newcommand{\sizebody}{\fontsize{8.8pt}{11pt}\selectfont}  % normal body text
-\newcommand{\sizefooter}{\fontsize{6pt}{8pt}\selectfont}     % small-print footer
-
-%--- Text: line spacing and the name's letter-spacing (tracking) -------------
-\newcommand{\cvlinespread}{1.02}
-\newcommand{\cvnametracking}{4.0}
-
-%--- Layout: column ratios, gutter, page-2 offset, work split, icon/badge ----
-\newcommand{\headerratio}{0.74}  % header row: left column share (0-1)
-\newcommand{\bodyratio}{0.505}   % body rows: left column share (0-1)
-\newlength{\bodycolsep}\setlength{\bodycolsep}{14pt}        % gutter between body columns (at 8pt pdftotext merges lines of the two columns; below 13pt pdfminer splits skill names)
-\newlength{\pagetwooffset}\setlength{\pagetwooffset}{68pt}  % top offset aligning page 2 to page 1
-\newcommand{\cvworksplit}{1}     % first N jobs go in the left column, rest in the right
-\newcommand{\cvsectioniconsize}{9pt}                        % section-header icon height
-\newcommand{\cvsectioniconraise}{-0.18em}                   % icon vertical nudge onto the label baseline
-\newlength{\cvsectioniconsep}\setlength{\cvsectioniconsep}{6pt}   % gap icon -> section label
-\newlength{\cvcoursebadgewidth}\setlength{\cvcoursebadgewidth}{13pt} % course grade badge width
-\newlength{\cvqrcodex}\setlength{\cvqrcodex}{320pt}             % header QR code: offset from the page left edge
-\newlength{\cvqrcodey}\setlength{\cvqrcodey}{18pt}              % header QR code: offset from the page top edge
-\newlength{\cvqrcodesize}\setlength{\cvqrcodesize}{50pt}        % header QR code: side length
-
-%--- Vertical spacing --------------------------------------------------------
-% content.tex never sets \vspace itself; these lengths control every gap and the
-% structural macros below insert them automatically. Keep the BETWEEN-block gaps
-% larger than the WITHIN-element gaps so sections stay visually separated from
-% the lines inside a single element.
-
-% Between blocks:
-\newlength{\sectiongap}\setlength{\sectiongap}{6pt}              % between sections (e.g. Introduction -> Experience)
-\newlength{\sectionlabelgap}\setlength{\sectionlabelgap}{4pt}    % section label -> its content
-\newlength{\headerblockgap}\setlength{\headerblockgap}{6pt}      % between header right-column blocks
-\newlength{\headerblocklabelgap}\setlength{\headerblocklabelgap}{2pt} % header block label -> its lines
-
-% Within the header:
-\newlength{\namegap}\setlength{\namegap}{6pt}                    % name -> role line
-\newlength{\rolegap}\setlength{\rolegap}{2pt}                    % role line -> headline
-\newlength{\headerbottomgap}\setlength{\headerbottomgap}{4pt}    % below the whole header
-\newlength{\contactlinegap}\setlength{\contactlinegap}{1pt}      % between contact lines
-
-% Within an element:
-\newlength{\bodygap}\setlength{\bodygap}{3pt}                    % between consecutive body paragraphs / entries
-\newlength{\newlinegap}\setlength{\newlinegap}{3pt}              % between \\ new lines in a body
-\newlength{\entrytopgap}\setlength{\entrytopgap}{2.4pt}            % above an entry title
-\newlength{\entrymetagap}\setlength{\entrymetagap}{1pt}          % below an entry meta line
-\newlength{\edugap}\setlength{\edugap}{2.4pt}                      % above an education row
-\newlength{\coursegap}\setlength{\coursegap}{1.8pt}             % between course rows
-\newlength{\skillgap}\setlength{\skillgap}{2.4pt}                 % above a skill row
-\newlength{\langtoppad}\setlength{\langtoppad}{2.4pt}            % lead-in above the language pair
-\newlength{\langlinegap}\setlength{\langlinegap}{1pt}         % language name -> level line
-\newcommand{\cvlangcellwidth}{0.5}                             % language cell width as a share of the column
-
-% Bullet lists (itemize) inside any body:
-\newcommand{\cvlistindent}{1em}  % bullet indentation
-\newlength{\cvlistitemsep}\setlength{\cvlistitemsep}{0pt}     % between list items
-\newlength{\cvlisttopsep}\setlength{\cvlisttopsep}{1pt}       % above/below the whole list
-\newlength{\cvlistparsep}\setlength{\cvlistparsep}{0pt}       % between paragraphs in an item
+% Class defaults.
+\cvset{
+  %--- Page: paper dimensions and margins ------------------------------------
+  paperwidth   = 595pt,
+  paperheight  = 842pt,
+  margintop    = 22pt,
+  marginbottom = 20pt,
+  marginleft   = 26pt,
+  marginright  = 19pt,
+  %--- Fonts: file names, looked up in fontdir (empty: the TeX distribution) -
+  % Latin Modern Sans ships with every TeX Live, so the class works out of the
+  % box; point these at any other .otf/.ttf files. It has no light weight, so
+  % fontlight falls back to the regular face.
+  fontdir        = {},
+  fontregular    = lmsans10-regular.otf,
+  fontbold       = lmsans10-bold.otf,
+  fontitalic     = lmsans10-oblique.otf,
+  fontbolditalic = lmsans10-boldoblique.otf,
+  fontlight      = lmsans10-regular.otf,
+  %--- Colors (hex, without the leading #) -----------------------------------
+  accent    = 22A39F, % section headers, role line, links, badges
+  primary   = 1A1A1A, % primary text (name, titles, headline, body)
+  secondary = 666666, % secondary text (education, footer, entry meta)
+  %--- Font sizes as {size}{leading} -----------------------------------------
+  namesize       = {23pt}{25pt},  % header name
+  rolesize       = {9pt}{11pt},   % header role line
+  headlinesize   = {10pt}{12pt},  % header tagline
+  labelsize      = {8pt}{8pt},    % section + block labels
+  headertextsize = {8pt}{10pt},   % header block lines (location, contacts)
+  bodysize       = {8.8pt}{11pt}, % normal body text
+  footersize     = {6pt}{8pt},    % small-print footer
+  %--- Text: line spacing and the name's letter-spacing (tracking) -----------
+  linespread   = 1.02,
+  nametracking = 4.0,
+  %--- Layout: column ratios, gutter, work split, icon/badge, QR code --------
+  headerratio      = 0.74,    % header row: left column share (0-1)
+  bodyratio        = 0.505,   % body rows: left column share (0-1)
+  bodycolsep       = 14pt,    % gutter between body columns (at 8pt pdftotext merges lines of the two columns; below 13pt pdfminer splits skill names)
+  worksplit        = 1,       % first N jobs go in the left column, rest in the right
+  sectioniconsize  = 9pt,     % section-header icon height
+  sectioniconraise = -0.18em, % icon vertical nudge onto the label baseline
+  sectioniconsep   = 6pt,     % gap icon -> section label
+  coursebadgewidth = 13pt,    % course grade badge width
+  qrcodex          = 320pt,   % header QR code: offset from the page left edge
+  qrcodey          = 18pt,    % header QR code: offset from the page top edge
+  qrcodesize       = 50pt,    % header QR code: side length
+  %--- Vertical spacing ------------------------------------------------------
+  % The document never sets \vspace itself; these lengths control every gap and
+  % the structural macros below insert them automatically. Keep the BETWEEN-
+  % block gaps larger than the WITHIN-element gaps so sections stay visually
+  % separated from the lines inside a single element.
+  % Between blocks:
+  sectiongap          = 6pt,   % between sections (e.g. Introduction -> Experience)
+  sectionlabelgap     = 4pt,   % section label -> its content
+  headerblockgap      = 6pt,   % between header right-column blocks
+  headerblocklabelgap = 2pt,   % header block label -> its lines
+  % Within the header:
+  namegap             = 6pt,   % name -> role line
+  rolegap             = 2pt,   % role line -> headline
+  headerbottomgap     = 4pt,   % below the whole header
+  contactlinegap      = 1pt,   % between contact lines
+  % Within an element:
+  bodygap             = 3pt,   % between consecutive body paragraphs / entries
+  newlinegap          = 3pt,   % between \\ new lines in a body
+  entrytopgap         = 2.4pt, % above an entry title
+  entrymetagap        = 1pt,   % below an entry meta line
+  edugap              = 2.4pt, % above an education row
+  coursegap           = 1.8pt, % between course rows
+  skillgap            = 2.4pt, % above a skill row
+  langtoppad          = 2.4pt, % lead-in above the language pair
+  langlinegap         = 1pt,   % language name -> level line
+  langcellwidth       = 0.5,   % language cell width as a share of the column
+  %--- Bullet lists (itemize) inside any body --------------------------------
+  listindent  = 1em, % bullet indentation
+  listitemsep = 0pt, % between list items
+  listtopsep  = 1pt, % above/below the whole list
+  listparsep  = 0pt, % between paragraphs in an item
+}
+\ProcessKeyOptions[gmresume]
 %=============================================================================
 
 %----------------- APPLIES THE SETTINGS ABOVE (do not edit below) -----------------
-\geometry{
-  paperwidth=\cvpaperwidth, paperheight=\cvpaperheight,
-  top=\cvmargintop, bottom=\cvmarginbottom,
-  left=\cvmarginleft, right=\cvmarginright
-}
-
-\setmainfont{\fontregular}[
-  Path            = \fontdir,
-  BoldFont        = \fontbold,
-  ItalicFont      = \fontitalic,
-  BoldItalicFont  = \fontbolditalic
-]
-\newfontfamily\sflight{\fontlight}[Path=\fontdir]
+% Settings can change until \begin{document}, so the ones that cannot be
+% re-applied later (geometry, fonts, PDF metadata) are applied at its very
+% start: begindocument/before runs ahead of every package's \AtBeginDocument
+% code, which is where hyperref and hyperxmp read the metadata (pdflang in
+% particular is ignored if set any later).
+\AddToHook{begindocument/before}{%
+  \geometry{
+    paperwidth=\cvpaperwidth, paperheight=\cvpaperheight,
+    top=\cvmargintop, bottom=\cvmarginbottom,
+    left=\cvmarginleft, right=\cvmarginright
+  }%
+  \edef\cv@setfonts{%
+    \noexpand\setmainfont{\fontregular}[%
+      \ifx\fontdir\@empty\else Path = \fontdir,\fi
+      BoldFont       = \fontbold,
+      ItalicFont     = \fontitalic,
+      BoldItalicFont = \fontbolditalic]%
+    \noexpand\newfontfamily\noexpand\sflight{\fontlight}[%
+      \ifx\fontdir\@empty\else Path = \fontdir\fi]}%
+  \cv@setfonts
+  \applymetadata
+  \color{primary}%
+  \linespread{\cvlinespread}%
+  \normalsize}
 
 % hyperxmp moves Author/Keywords to the XMP stream only; keeppdfinfo also
 % keeps them in the classic Info dictionary, which LinkedIn and ATS tools read.
-% The metadata values themselves are declared in content.tex (see
+% The metadata values themselves are declared by the document (see
 % \applymetadata below).
 \hypersetup{keeppdfinfo = true}
 
@@ -145,13 +272,10 @@
 \tolerance=2000
 \emergencystretch=3em % last-resort stretch so unhyphenated long words wrap instead of overflowing the column
 
-\color{primary}
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
 \setlength{\JustifyingParindent}{0pt}
-\linespread{\cvlinespread}
-\renewcommand\normalsize{\sizebody}
-\normalsize
+\renewcommand\normalsize{\sizebody} % applied at \begin{document}
 
 % Tracks whether the next \body is the first of its group (no leading gap) or a
 % follow-on paragraph (gets \bodygap). Reset by every macro that opens a group.
@@ -159,10 +283,10 @@
 \newcommand{\resetbodygap}{\global\cvfirstbodytrue}
 \resetbodygap
 
-%----------------- CONTENT BUCKETS (content.tex fills these) -----------------
-% content.tex declares only elements. Each element macro appends its rendered
-% form to one of these lists; \makecv (invoked once, from main.tex) lays the
-% lists out into sections, columns and pages. No structure lives in content.tex.
+%----------------- CONTENT BUCKETS (the document fills these) ----------------
+% The document declares only elements. Each element macro appends its rendered
+% form to one of these lists; \makecv (invoked once, by the document) lays the
+% lists out into sections, columns and pages. No structure lives in the document.
 \makeatletter
 \newcommand{\appendto}[2]{\g@addto@macro#1{#2}}
 \makeatother
@@ -186,7 +310,7 @@
 %----------------- STRUCTURAL MACROS -----------------
 % Header block: name, role, tagline (left) + location/contacts (right)
 % -- Declarative header fields ---------------------------------------------
-% content.tex only DECLARES facts with these setters; it never touches the
+% The document only DECLARES facts with these setters; it never touches the
 % document structure. \makecvheader renders them into the two-column header.
 %
 %   \name{JANE DOE}
@@ -255,11 +379,9 @@
 \newcommand{\cvpdfkeywords}{} \newcommand{\pdfkeywords}[1]{\renewcommand{\cvpdfkeywords}{#1}}
 \newcommand{\cvpdflanguage}{} \newcommand{\pdflanguage}[1]{\renewcommand{\cvpdflanguage}{#1}}
 
-% Write the declared metadata into the PDF. Runs at the very start of
-% \begin{document} (begindocument/before, ahead of every package's
-% \AtBeginDocument code), after main.tex has read content.tex in the preamble:
-% hyperref and hyperxmp read pdflang there, so setting it any later is ignored.
-\AddToHook{begindocument/before}{\applymetadata}
+% Write the declared metadata into the PDF. Called at the very start of
+% \begin{document} (see APPLIES THE SETTINGS ABOVE), after the document has
+% declared its content in the preamble.
 \newcommand{\applymetadata}{%
   \hypersetup{
     pdftitle    = {\cvpdftitle},
@@ -295,7 +417,7 @@
   {\color{accent}\sizelabel #1}\\[\headerblocklabelgap]{\sizeheadertext #2\par}}
 
 %----------------- STRUCTURAL SKELETON (used only by \makecv) -----------------
-% content.tex never calls any of these; \makecv assembles the document.
+% The document never calls any of these; \makecv assembles the document.
 % Open / close the two independent body columns
 \newcommand{\bodystart}{%
   \columnratio{\bodyratio}\setlength{\columnsep}{\bodycolsep}\begin{paracol}{2}}
@@ -305,12 +427,12 @@
 % Page break that repeats the header on the new page
 \newcommand{\cvnewpage}{\newpage\makecvheader}
 
-% Section header: teal icon (from assets/images/) + teal uppercase label
-% #1 = icon file (in assets/images/, without extension), #2 = label
+% Section header: icon + accent-colored uppercase label
+% #1 = icon name (icons/gmresume-<name>.pdf, installed with the class), #2 = label
 \newcommand{\cvsection}[2]{%
   \resetbodygap
   \vspace{\sectiongap}%
-  \noindent\raisebox{\cvsectioniconraise}{\includesvg[height=\cvsectioniconsize]{#1}}\hspace{\cvsectioniconsep}%
+  \noindent\raisebox{\cvsectioniconraise}{\includegraphics[height=\cvsectioniconsize]{gmresume-#1}}\hspace{\cvsectioniconsep}%
   {\color{accent}\sizelabel #2}\par
   \vspace{\sectionlabelgap}%
 }
@@ -369,8 +491,8 @@
 \newcommand{\cvedunote}{%
   \iffield{\cvfootertext}{\vspace{\edugap}{\sflight\sizefooter\color{secondary}\cvfootertext\par}}}
 
-%----------------- ELEMENT DECLARATIONS (content.tex uses only these) --------
-% Each macro appends its element to the relevant section bucket. content.tex is
+%----------------- ELEMENT DECLARATIONS (the document uses only these) -------
+% Each macro appends its element to the relevant section bucket. The content is
 % a flat list of these calls: no sections, columns, pages, or body plumbing.
 % In any body/description, \\ starts a new line spaced by \newlinegap.
 %
@@ -385,10 +507,10 @@
 %   \lang{Name}{Level}
 %   \footer{Small-print note shown under the Education section.}
 % Introduction: a single element. Like every body, \\ starts a new line
-% (spaced by \newlinegap). content.tex declares exactly one \introduction.
+% (spaced by \newlinegap). Declare exactly one \introduction.
 \long\def\introduction#1{\appendto\cvintro{\body{#1}}}
 % Jobs route to the left column bucket until \cvworksplit is reached, then to
-% the right column bucket — so content.tex just lists jobs in order.
+% the right column bucket — so the document just lists jobs in order.
 \newcommand{\job}[5][]{%
   \stepcounter{cvjobno}%
   \ifnum\value{cvjobno}>\cvworksplit\relax
@@ -429,7 +551,7 @@
     \cvsection{publications}{PUBLICATIONS}\cvpubs
     \cvsection{education}{EDUCATION}\cvedu\cvedunote
     \cvsection{honours}{AWARDS}\cvhonours
-    % Languages is rendered only when content.tex declared at least one \lang.
+    % Languages is rendered only when the document declared at least one \lang.
     \iffield{\cvlangs}{\cvsection{languages}{LANGUAGES}\vspace{\langtoppad}\noindent\cvlangs\par}
   \bodyend
 }

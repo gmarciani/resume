@@ -1,14 +1,28 @@
 %-------------------------------------------------------------------------------
-% main.tex — entry point. Compile with: xelatex main.tex
+% main.tex — entry point. Compile from the repository root with:
+%   mkdir -p build && xelatex -output-directory=build src/main.tex
+% (twice, for the QR code position), or with: make build
 %
-% Layout/style lives in  layout.tex   (how the CV looks)
-% Content lives in        content.tex  (what the CV says)
+% Layout/style lives in  gmresume.cls  (how the CV looks; reusable class)
+% Content lives in        content.tex   (what the CV says)
+% This file only picks the class settings that differ from its defaults.
 %-------------------------------------------------------------------------------
-\input{layout.tex}
+\documentclass{gmresume}
+
+% SF Pro, from this repository (not distributed with the class).
+\cvset{
+  fontdir        = assets/fonts/,
+  fontregular    = SF-Pro-Text-Regular.otf,
+  fontbold       = SF-Pro-Text-Semibold.otf,
+  fontitalic     = SF-Pro-Text-RegularItalic.otf,
+  fontbolditalic = SF-Pro-Text-SemiboldItalic.otf,
+  fontlight      = SF-Pro-Text-Light.otf,
+}
+
 % content.tex only declares elements (fills the header/metadata fields and the
 % section buckets) and typesets nothing, so it is read in the preamble: the PDF
 % metadata it declares must be set before \begin{document}.
-\input{content.tex}
+\input{src/content.tex}
 
 \begin{document}
 % \makecv assembles the declared elements into the laid-out document.
