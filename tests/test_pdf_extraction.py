@@ -20,6 +20,9 @@ from pathlib import Path
 import pytest
 from pdfminer.high_level import extract_pages, extract_text
 from pdfminer.layout import LTTextContainer, LTTextLine
+from pdfminer.pdfdocument import PDFDocument
+from pdfminer.pdfparser import PDFParser
+from pdfminer.pdftypes import resolve1
 
 ROOT = Path(__file__).resolve().parent.parent
 PDF = Path(os.environ.get("RESUME_PDF", ROOT / "build" / "resume.pdf"))
@@ -116,6 +119,25 @@ def text(lines):
 
 
 @pytest.fixture(scope="session")
+def document(pdf):
+    """The parsed PDF document, for its Info dictionary, catalog and XMP stream."""
+    with open(pdf, "rb") as f:
+        doc = PDFDocument(PDFParser(f))
+        # Resolve everything the tests read while the file is still open.
+        doc.info_fields = {k: decode(resolve1(v)) for k, v in doc.info[0].items()}
+        doc.lang = decode(resolve1(doc.catalog.get("Lang")))
+        doc.xmp = resolve1(doc.catalog["Metadata"]).get_data().decode()
+    return doc
+
+
+def decode(value):
+    """PDF string (bytes, PDFDocEncoding or UTF-16BE with BOM) -> str."""
+    if not isinstance(value, bytes):
+        return value
+    return value[2:].decode("utf-16-be") if value.startswith(b"\xfe\xff") else value.decode("latin-1")
+
+
+@pytest.fixture(scope="session")
 def pages(pdf):
     return [" ".join(norm(l) for l in extract_text(pdf, page_numbers=[i]).splitlines() if norm(l))
             for i in range(2)]
@@ -206,3 +228,25 @@ def test_no_text_line_crosses_the_column_gutter(pdf):
                 if isinstance(line, LTTextLine) and line.x0 < gutter_start and line.x1 > gutter_end:
                     crossing.append((page_no, norm(line.get_text())))
     assert not crossing, f"text lines spanning both columns: {crossing}"
+
+
+@pytest.mark.parametrize("macro,field", [
+    ("pdftitle", "Title"),
+    ("pdfauthor", "Author"),
+    ("pdfsubject", "Subject"),
+    ("pdfkeywords", "Keywords"),
+])
+def test_info_dictionary_has_declared_metadata(document, macro, field):
+    """LinkedIn and ATS tools read the classic Info dictionary."""
+    assert document.info_fields.get(field) == plain(declarations(macro, 1)[0][0])
+
+
+def test_catalog_has_declared_language(document):
+    assert document.lang == declarations("pdflanguage", 1)[0][0]
+
+
+def test_xmp_has_declared_language_and_source_url(document):
+    language, = declarations("pdflanguage", 1)[0]
+    url, = declarations("qrcodeurl", 1)[0]
+    assert re.search(rf"<dc:language>\s*<rdf:Bag>\s*<rdf:li>{re.escape(language)}</rdf:li>", document.xmp)
+    assert f"<dc:source>{url}</dc:source>" in document.xmp
