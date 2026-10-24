@@ -16,11 +16,18 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Install LaTeX and Inkscape
+      - name: Install LaTeX
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            texlive-xetex texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra inkscape
+            texlive-xetex texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra
+
+      # As make setup does on macOS: link the class into the personal TeX tree.
+      - name: Install the gmresume class
+        run: |
+          texmf="$(kpsewhich -var-value TEXMFHOME)"
+          mkdir -p "$texmf/tex/latex"
+          ln -sfn "$PWD/gmresume" "$texmf/tex/latex/gmresume"
 
       - name: Build resume.pdf
         run: make build

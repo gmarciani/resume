@@ -7,7 +7,8 @@ the common open-source resume parsers, e.g. pyresparser) and check that every
 element declared in src/content.tex comes out whole, in reading order, and
 never mixed with the text of the other column.
 
-Expected values are read from src/content.tex and src/layout.tex, so the tests
+Expected values are read from src/content.tex, src/main.tex and
+gmresume/gmresume.cls, so the tests
 follow content and layout changes without being edited.
 
 Run with:  make build && make test
@@ -28,8 +29,9 @@ ROOT = Path(__file__).resolve().parent.parent
 PDF = Path(os.environ.get("RESUME_PDF", ROOT / "build" / "resume.pdf"))
 CONTENT = (ROOT / "src" / "content.tex").read_text()
 # Only for the page geometry (paper width, margins, column ratio, gutter) that
-# locates the column gutter in test_no_text_line_crosses_the_column_gutter.
-LAYOUT = (ROOT / "src" / "layout.tex").read_text()
+# locates the column gutter in test_no_text_line_crosses_the_column_gutter:
+# the class defaults, then the document's \cvset overrides.
+SETTINGS = [(ROOT / "gmresume" / "gmresume.cls").read_text(), (ROOT / "src" / "main.tex").read_text()]
 
 # Section labels rendered by \makecv, in reading order (left column, then right
 # column, page by page).
@@ -90,11 +92,12 @@ def norm(text):
     return re.sub(r"\s+", " ", text.replace("\u2019", "'")).strip()
 
 
-def tex_number(name):
-    m = re.search(rf"\\newcommand\{{\\{name}\}}\{{([\d.]+)(?:pt)?\}}", LAYOUT) or \
-        re.search(rf"\\setlength\{{\\{name}\}}\{{([\d.]+)pt\}}", LAYOUT)
-    assert m, f"{name} not found in layout.tex"
-    return float(m.group(1))
+def setting(key):
+    """Numeric value of a gmresume setting (in pt for lengths): the last `key = value`."""
+    values = [m.group(1) for tex in SETTINGS
+              for m in re.finditer(rf"(?<![\w.]){key}\s*=\s*([\d.]+)(?:pt)?\b", strip_comments(tex))]
+    assert values, f"setting {key} not found"
+    return float(values[-1])
 
 
 #----------------- fixtures -----------------
@@ -213,10 +216,10 @@ def test_every_skill_keyword_is_extracted_as_a_whole_word(text):
 
 def test_no_text_line_crosses_the_column_gutter(pdf):
     """A line spanning both body columns means the parser mixed the two columns."""
-    width = tex_number("cvpaperwidth")
-    left, right = tex_number("cvmarginleft"), tex_number("cvmarginright")
-    colsep = tex_number("bodycolsep")
-    gutter_start = left + tex_number("bodyratio") * (width - left - right - colsep)
+    width = setting("paperwidth")
+    left, right = setting("marginleft"), setting("marginright")
+    colsep = setting("bodycolsep")
+    gutter_start = left + setting("bodyratio") * (width - left - right - colsep)
     gutter_end = gutter_start + colsep
 
     crossing = []

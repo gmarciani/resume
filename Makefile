@@ -4,33 +4,53 @@ SRC_DIR   := src
 BUILD_DIR := build
 PUBLIC_DIR  := public
 ASSETS_DIR  := assets
+CLASS_NAME  := gmresume
 MAIN      := $(SRC_DIR)/main.tex
 PDF_NAME    := resume.pdf
 BUILD_PDF   := $(BUILD_DIR)/$(PDF_NAME)
 PUBLIC_PDF  := $(PUBLIC_DIR)/$(PDF_NAME)
 
-# Let xelatex find layout.tex / content.tex and the assets under src/ and root.
-export TEXINPUTS := .:./$(SRC_DIR):
+# Section icons of the $(CLASS_NAME) class: SVG sources in $(CLASS_NAME)/assets/,
+# converted by build-assets to the PDFs in $(CLASS_NAME)/icons/ that the class
+# includes. Both are committed, so documents using the class need neither
+# Inkscape nor --shell-escape. Regenerate the PDFs after editing an SVG.
+ICON_SRC_DIR := $(CLASS_NAME)/assets
+ICON_DIR     := $(CLASS_NAME)/icons
 
-.PHONY: help setup build test view watch clean
+.PHONY: help setup build-assets build test view watch clean
 
 help: ## show this help message
 	@echo "Available targets:"
-	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  %-10s %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  %-14s %s\n", $$1, $$2}'
 
-setup: ## install LaTeX dependencies (once)
+setup: ## install LaTeX dependencies and the LaTeX class (once)
 	brew install --cask basictex inkscape
 	brew install fswatch
 	sudo tlmgr update --self
-	sudo tlmgr install paracol fontawesome5 enumitem svg trimspaces transparent catchfile footmisc hyperxmp ifmtarg hyperxmp qrcode
+	sudo tlmgr install paracol fontawesome5 enumitem trimspaces transparent catchfile footmisc hyperxmp ifmtarg hyperxmp qrcode
+	# Install the $(CLASS_NAME) class into the personal TeX tree (TEXMFHOME) as a
+	# symlink to $(CLASS_NAME)/: LaTeX finds it like any installed class, and
+	# edits to it take effect without reinstalling.
+	texmf="$$(kpsewhich -var-value TEXMFHOME)" && test -n "$$texmf" && \
+	  mkdir -p "$$texmf/tex/latex" && ln -sfn "$(CURDIR)/$(CLASS_NAME)" "$$texmf/tex/latex/$(CLASS_NAME)"
+
+build-assets: ## convert the LaTeX class icons from SVG to PDF (after editing an SVG)
+	mkdir -p $(ICON_DIR)
+	# --export-area-drawing crops each icon to its drawing.
+	for svg in $(ICON_SRC_DIR)/*.svg; do \
+	  inkscape --export-area-drawing --export-type=pdf \
+	    --export-filename=$(ICON_DIR)/$(CLASS_NAME)-$$(basename $$svg .svg).pdf $$svg || exit 1; \
+	done
 
 build: ## build resume.pdf and copy to public/ (default)
 	mkdir -p $(BUILD_DIR)
+	# Same as compiling by hand from the repository root:
+	#   xelatex -output-directory=build src/main.tex
 	# Run xelatex twice: the first pass writes references (hyperref page labels
 	# and PDF outlines) to main.aux/main.out; the second pass reads them back so
 	# the PDF is correct. A single pass leaves these stale.
-	xelatex --shell-escape -interaction=nonstopmode -halt-on-error -output-directory=$(BUILD_DIR) $(MAIN)
-	xelatex --shell-escape -interaction=nonstopmode -halt-on-error -output-directory=$(BUILD_DIR) $(MAIN)
+	xelatex -interaction=nonstopmode -halt-on-error -output-directory=$(BUILD_DIR) $(MAIN)
+	xelatex -interaction=nonstopmode -halt-on-error -output-directory=$(BUILD_DIR) $(MAIN)
 	# Copy in place (not mv) so $(BUILD_PDF) keeps its inode: PDF viewers such as
 	# Preview watch the open file and reload it automatically when it is rewritten.
 	cp $(BUILD_DIR)/main.pdf $(BUILD_PDF) && rm $(BUILD_DIR)/main.pdf
@@ -44,8 +64,8 @@ view: ## open the built PDF (does not build; errors if missing)
 
 watch: build ## open the PDF and rebuild it whenever a source or asset file changes
 	@open $(BUILD_PDF)
-	@echo "Watching $(SRC_DIR)/ and $(ASSETS_DIR)/ for changes (Ctrl-C to stop)..."
-	@fswatch -o --latency 1 $(SRC_DIR) $(ASSETS_DIR) | while read -r _; do $(MAKE) build && open -g $(BUILD_PDF); done
+	@echo "Watching $(SRC_DIR)/, $(CLASS_NAME)/ and $(ASSETS_DIR)/ for changes (Ctrl-C to stop)..."
+	@fswatch -o --latency 1 $(SRC_DIR) $(CLASS_NAME) $(ASSETS_DIR) | while read -r _; do $(MAKE) build && open -g $(BUILD_PDF); done
 
 clean: ## remove the build folder
 	rm -rf $(BUILD_DIR)
